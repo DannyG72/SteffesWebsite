@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
 // @namespace    423048753940261
-// @version      1.0
+// @version      1.1
 // @description  Adds a few quick-link buttons to the Steffes Group website for admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auctions lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
