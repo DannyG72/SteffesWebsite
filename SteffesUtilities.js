@@ -2,7 +2,7 @@
 // @name         Steffesgroup Utilities
 // @namespace    423048753940261
 // @version      1.2
-// @description  Adds a few quick-link buttons to the Steffes Group website for admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auctions lots.
+// @description  Adds a few quick-link buttons to the Steffes Group website for admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
 // @grant        none
@@ -10,9 +10,6 @@
 
 (function() {
     'use strict';
-    $(".headerMobileBtn").hide()
-    $(".mobileSiteDiv").hide()
-
     //Creates a search bar for searching bidders.
     var bidderSearch = document.createElement("INPUT");
     bidderSearch.placeholder="Search Bidders...";
@@ -62,6 +59,8 @@
     if (currentPageUrl.startsWith('https://steffesgroup.com/Auction/AuctionDetails?Name=')) {
       //Takes the lotIDS variable from the SteffesGroup website and splits it into a array to be used for the options in the selection list
       var lotIDS = lotids.split('-');
+      lotIDS.pop();
+      var arrayOpts = lotIDS;
 
       //Creates the selectList object for the auction lots.
       var selectList = document.createElement("SELECT");
@@ -105,7 +104,6 @@
         document.body.appendChild(backendButton);
         if (arrayOpts.length > 0) document.body.appendChild(lotBackendGo);
         $(".advancedSearchBtn").hide();}})();
-
 
 //Get the value from the bidder Search Bar
 function getSearchBidder() {
