@@ -21,7 +21,7 @@
         getSearchBidder();}});
     document.body.appendChild(bidderSearch);
 
-    //Creates a go button for activating the search bar.
+    //Creates a go button for activating the bidder search bar.
     var bidderButton = document.createElement("Button");
     bidderButton.innerHTML = "Go";
     bidderButton.id="SearhBidderButton";
