@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
 // @namespace    423048753940261
-// @version      1.4
+// @version      2.0
 // @description  Adds a few quick-link buttons to the Steffes Group website for admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
@@ -104,6 +104,15 @@
     rightSide.className='custom-right-side';
     parent.appendChild(rightSide);
 
+    let steffesLogo = document.createElement("IMG");
+    steffesLogo.id="SteffesLogo";
+    steffesLogo.setAttribute("src", "https://i.imgur.com/tgiUYPe.png");
+    //steffesLogo.onmouseover="" style="cursor: pointer"
+    steffesLogo.style.cursor="pointer";
+    steffesLogo.onclick = function(event) {
+         window.location.href = 'https://steffesgroup.com';
+    };
+
       //Creates a search bar for searching bidders.
     let bidderSearch = document.createElement("INPUT");
     bidderSearch.placeholder="Search Bidders...";
@@ -134,12 +143,12 @@
 
     //Creates a button to open the SteffesGroup admin portal.
     let adminButton = document.createElement("Button");
-    adminButton.innerHTML = "Open Steffes Admin Page";
+    adminButton.innerHTML = "Admin Portal";
     adminButton.id="adminButton";
     adminButton.className= 'custom-button-for-stuff'
     adminButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/Auctions');});
 
-
+    leftSide.appendChild(steffesLogo);
     leftSide.appendChild(adminButton);
     leftSide.appendChild(bidderSearch);
     leftSide.appendChild(bidderButton);
@@ -147,6 +156,20 @@
 
     //Checks to see if the current page is an auction page, if so, append auction specific buttons.
     if (currentPageUrl.startsWith('https://steffesgroup.com/Auction/AuctionDetails?Name=')) {
+      let lotBackendGo = document.createElement("Button");
+      lotBackendGo.innerHTML = "Go";
+      lotBackendGo.id="SearhBidderButton";
+      lotBackendGo.className= 'custom-button-for-stuff'
+      lotBackendGo.addEventListener("click", function() {
+        let selected = selectList.selectedOptions[0].value;
+        let html = content.outerHTML;
+        let splitHTML = (html.split(selected))[0];
+        let splitLots = splitHTML.split('datatablestart-lot-');
+        let currentAuc = splitLots.pop();
+        let foundLotID = currentAuc.split('" style="')[0];
+        let backendLotLink = 'https://steffesgroup.com/Admin/LotDetails?lotId='+foundLotID;
+        openInNewTab(backendLotLink);});
+        rightSide.appendChild(backendButton);
       //Takes the lotIDS letiable from the SteffesGroup website and splits it into a array to be used for the options in the selection list
       let lotIDS = lotids.split('-');
       lotIDS.pop();
@@ -175,20 +198,6 @@
         if (arrayOpts.length > 0) selectList.appendChild(option);}
 
         //Create and append the Go button for the lot listing
-        let lotBackendGo = document.createElement("Button");
-        lotBackendGo.innerHTML = "Go";
-        lotBackendGo.id="SearhBidderButton";
-        lotBackendGo.className= 'custom-button-for-stuff'
-        lotBackendGo.addEventListener("click", function() {
-          let selected = selectList.selectedOptions[0].value;
-          let html = content.outerHTML;
-          let splitHTML = (html.split(selected))[0];
-          let splitLots = splitHTML.split('datatablestart-lot-');
-          let currentAuc = splitLots.pop();
-          let foundLotID = currentAuc.split('" style="')[0];
-          let backendLotLink = 'https://steffesgroup.com/Admin/LotDetails?lotId='+foundLotID;
-          openInNewTab(backendLotLink);});
-        rightSide.appendChild(backendButton);
         if (arrayOpts.length > 0) rightSide.appendChild(lotBackendGo);
         $(".advancedSearchBtn").hide();}})();
 
