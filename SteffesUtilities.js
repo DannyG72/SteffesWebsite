@@ -24,6 +24,7 @@
     + 'font-size: 18px;'
     + 'z-index: 1033;'
     + 'outline: none;'
+    + 'display: inline-block;'
     + 'min-width: 50px;'
     + '}'
     + '.custom-button-for-stuff:hover{'
@@ -42,14 +43,14 @@
     + 'background: #CE0000;'
     + '}'
     + '.custom-left-side{'
-    + 'width: 50%;'
+    + 'width: 100%;'
     + 'height: 100%;'
     + 'display: flex;'
     + 'align-items: center;'
     + 'justify-content: flex-start;'
     + '}'
     + '.custom-right-side{'
-    + 'width: 50%;'
+    + 'width: 100%;'
     + 'height: 100%;'
     + 'display: flex;'
     + 'align-items: center;'
@@ -57,9 +58,13 @@
     + '}'
     + '.custom-admin-button{'
     + 'justify-self: center;'
+    + 'min-width: 113px; !important'
+    + 'padding-left: 10px;'
+    + 'display: inline-block;'
     + '}'
     + '.custom-search-input{'
     + 'height: 30px;'
+    + 'width: 150px;'
     + 'border-radius: 10px;'
     + 'outline: none;'
     + 'border: none;'
@@ -81,7 +86,11 @@
 
     'use strict';
 
-    //Hides mobile site indicators if present
+    //Gets the current page url and strips the auction ID from it
+    let currentPageUrl = window.location.href;
+    let AuctionID = ((currentPageUrl.split("").reverse().join("").split("-"))[0]).split("").reverse().join("");
+
+    //Hides mobile site indicators/changes header color if present
     let div = document.getElementById("mobileSiteDiv");
     if (div) {
     div.parentNode.removeChild(div)}; // Hides it
@@ -90,7 +99,12 @@
     oldHeader.style.background="#CE0000"
     let oldHeaderBackground = document.getElementById('header-bg')
     oldHeaderBackground.style.background="#CE0000"
-    //GM_addStyle("div[style*='login_background2.jpg'] {background-image: url('INSERT YOUR IMAGE')!important;} ")
+    let loginButton = document.getElementById('contactTopNav')
+    try {
+      loginButton.style.marginTop="0px"
+    }
+    catch(err) {console.log('noLoginButton')
+    }
 
     let parent = document.createElement('div');
     parent.className= 'custom-div-parent';
@@ -106,7 +120,7 @@
 
     let steffesLogo = document.createElement("IMG");
     steffesLogo.id="SteffesLogo";
-    steffesLogo.setAttribute("src", "https://i.imgur.com/tgiUYPe.png");
+    steffesLogo.setAttribute("src", "https://i.imgur.com/5UVVBEC.png");
     //steffesLogo.onmouseover="" style="cursor: pointer"
     steffesLogo.style.cursor="pointer";
     steffesLogo.onclick = function(event) {
@@ -125,14 +139,10 @@
 
     //Creates a go button for activating the search bar.
     let bidderButton = document.createElement("Button");
-    bidderButton.innerHTML = "Go";
+    bidderButton.innerHTML = "Search";
     bidderButton.id="SearhBidderButton";
     bidderButton.className= 'custom-button-for-stuff'
     bidderButton.addEventListener("click", function() {getSearchBidder();});
-
-    //Gets the current page url and strips the auction ID from it
-    let currentPageUrl = window.location.href;
-    let AuctionID = ((currentPageUrl.split("").reverse().join("").split("-"))[0]).split("").reverse().join("");
 
     //Creates the backend button for an auction page.
     let backendButton = document.createElement("Button");
@@ -141,15 +151,18 @@
     backendButton.className= 'custom-button-for-stuff custom-admin-button'
     backendButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/AuctionDetails?auctionId=' +AuctionID);});
 
-    //Creates a button to open the SteffesGroup admin portal.
-    let adminButton = document.createElement("Button");
-    adminButton.innerHTML = "Admin Portal";
-    adminButton.id="adminButton";
-    adminButton.className= 'custom-button-for-stuff'
-    adminButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/Auctions');});
-
     leftSide.appendChild(steffesLogo);
-    leftSide.appendChild(adminButton);
+    //Creates a button to open the SteffesGroup admin portal.
+    if (currentPageUrl.includes('Admin')) {
+    } else {
+      let adminButton = document.createElement("Button");
+      adminButton.innerHTML = "Admin Portal";
+      adminButton.id="adminButton";
+      adminButton.className= 'custom-button-for-stuff'
+      adminButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/Auctions');});
+      leftSide.appendChild(adminButton);
+    }
+
     leftSide.appendChild(bidderSearch);
     leftSide.appendChild(bidderButton);
 
@@ -199,7 +212,13 @@
 
         //Create and append the Go button for the lot listing
         if (arrayOpts.length > 0) rightSide.appendChild(lotBackendGo);
-        $(".advancedSearchBtn").hide();}})();
+        $(".advancedSearchBtn").hide();}
+
+    try {
+      rightSide.appendChild(loginButton)
+    }
+    catch(err) {}
+    })();
 
 //Get the value from the bidder Search Bar
 function getSearchBidder() {
