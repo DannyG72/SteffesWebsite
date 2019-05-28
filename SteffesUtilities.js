@@ -64,7 +64,7 @@
     + '}'
     + '.custom-search-input{'
     + 'height: 30px;'
-    + 'width: 150px;'
+    + 'width: 201px;'
     + 'border-radius: 10px;'
     + 'outline: none;'
     + 'border: none;'
@@ -126,23 +126,47 @@
     steffesLogo.onclick = function(event) {
          window.location.href = 'https://steffesgroup.com';
     };
-
-      //Creates a search bar for searching bidders.
     let bidderSearch = document.createElement("INPUT");
-    bidderSearch.placeholder="Search Bidders...";
     bidderSearch.id="bidderSearch";
     bidderSearch.className='custom-search-input';
     bidderSearch.setAttribute("type", "text");
-    bidderSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
-        event.preventDefault();
-        getSearchBidder();}});
 
     //Creates a go button for activating the search bar.
     let bidderButton = document.createElement("Button");
     bidderButton.innerHTML = "Search";
     bidderButton.id="SearhBidderButton";
     bidderButton.className= 'custom-button-for-stuff'
-    bidderButton.addEventListener("click", function() {getSearchBidder();});
+
+
+
+    if (currentPageUrl.startsWith('https://steffesgroup.com/Admin/SearchBidder')) {
+        //Creates a search bar for searching bidders.
+        console.log(1)
+
+        bidderSearch.placeholder="Nextlot Search Bidders...";
+        bidderSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
+            event.preventDefault();
+            let bidderString = document.getElementById("bidderSearch").value;
+            bidderString = bidderString.replace(/ /g,'%20');
+            openInNewTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
+            ;}});
+        bidderButton.addEventListener("click", function() {let bidderString = document.getElementById("bidderSearch").value;
+        bidderString = bidderString.replace(/ /g,'%20');
+        openInNewTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);});
+          } else {
+      //Creates a search bar for searching bidders.
+      console.log(2)
+        bidderSearch.placeholder="Search Bidders...";
+        bidderSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
+            event.preventDefault();
+            let bidderString = document.getElementById("bidderSearch").value;
+            bidderString = bidderString.replace(/ /g,'%20');
+            openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);
+            ;}});
+        bidderButton.addEventListener("click", function() {let bidderString = document.getElementById("bidderSearch").value;
+        bidderString = bidderString.replace(/ /g,'%20');
+        openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);});
+    }
 
     //Creates the backend button for an auction page.
     let backendButton = document.createElement("Button");
