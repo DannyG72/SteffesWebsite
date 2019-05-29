@@ -83,7 +83,7 @@
     + 'outline: none;'
     + 'border: none;'
     + 'box-shadow: none;'
-    + 'padding-left: 5px;'
+    + 'padding-left: 10px;'
     + 'margin-right: 5px;'
     + 'font-size: 18px;'
     + '}'
