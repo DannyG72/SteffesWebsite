@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
 // @namespace    423048753940261
-// @version      2.1
+// @version      2.2
 // @description  Adds a few quick-link buttons to the Steffes Group website for admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
@@ -19,19 +19,33 @@
     + 'box-shadow: none;'
     + 'cursor: pointer;'
     + 'padding-left: 5px;'
+    + 'margin-right: 5px;'
     + 'padding-right: 5px;'
     + 'height: 30px;'
     + 'font-size: 18px;'
     + 'z-index: 1033;'
     + 'outline: none;'
     + 'display: inline-block;'
-    + 'min-width: 50px;'
+    + 'min-width: 40px;'
     + '}'
     + '.custom-button-for-stuff:hover{'
     + 'background: #fff;'
     + 'color: #000;'
     + '}'
     + '.custom-div-parent{'
+    + 'display: inline-flex;'
+    + 'align-items: center;'
+    + 'justify-content: center;'
+    + 'position: fixed;'
+    + 'width: 960px;'
+    + 'height: 60px;'
+    + 'top: 0;'
+    + 'left: 50%;'
+    + 'transform: translate(-50%, 0);'
+    + 'z-index: 1032;'
+    + 'background: #CE0000;'
+    + '}'
+    + '.custom-div-grandParent{'
     + 'display: inline-flex;'
     + 'align-items: center;'
     + 'justify-content: center;'
@@ -69,9 +83,8 @@
     + 'outline: none;'
     + 'border: none;'
     + 'box-shadow: none;'
-    + 'padding-left: 10px;'
-    + 'margin-left: 10px;'
-    + 'margin-right: 10px;'
+    + 'padding-left: 5px;'
+    + 'margin-right: 5px;'
     + 'font-size: 18px;'
     + '}'
     + '.custom-select-input{'
@@ -79,6 +92,7 @@
     + 'height: 30px;'
     + 'font-size: 18px;'
     + 'outline: none;'
+    + 'margin-right: 5px;'
     + 'border-radius: 10px;'
     + '}'
 
@@ -90,21 +104,9 @@
     let currentPageUrl = window.location.href;
     let AuctionID = ((currentPageUrl.split("").reverse().join("").split("-"))[0]).split("").reverse().join("");
 
-    //Hides mobile site indicators/changes header color if present
-    let div = document.getElementById("mobileSiteDiv");
-    if (div) {
-    div.parentNode.removeChild(div)}; // Hides it
-    $('img[src="https://cdn.steffesgroup.com/static-files/images/interior/Steffes-Auctioneers-logo.png"]').hide();
-    let oldHeader = document.getElementById('header-content')
-    oldHeader.style.background="#CE0000"
-    let oldHeaderBackground = document.getElementById('header-bg')
-    oldHeaderBackground.style.background="#CE0000"
-    let loginButton = document.getElementById('contactTopNav')
-    try {
-      loginButton.style.marginTop="0px"
-    }
-    catch(err) {console.log('noLoginButton')
-    }
+    let grandParent = document.createElement('div');
+    grandParent.className= 'custom-div-grandParent';
+    document.body.appendChild(grandParent);
 
     let parent = document.createElement('div');
     parent.className= 'custom-div-parent';
@@ -118,14 +120,36 @@
     rightSide.className='custom-right-side';
     parent.appendChild(rightSide);
 
+    let loginButton = document.getElementsByClassName("loginButton")[0]
     let steffesLogo = document.createElement("IMG");
     steffesLogo.id="SteffesLogo";
+    steffesLogo.style.marginRight = '5px';
     steffesLogo.setAttribute("src", "https://i.imgur.com/5UVVBEC.png");
     //steffesLogo.onmouseover="" style="cursor: pointer"
     steffesLogo.style.cursor="pointer";
-    steffesLogo.onclick = function(event) {
-         window.location.href = 'https://steffesgroup.com';
-    };
+    leftSide.appendChild(steffesLogo);
+
+    //Hides mobile site indicators/changes header color if present
+    let div = document.getElementById("mobileSiteDiv");
+    if (div) {
+      div.parentNode.removeChild(div)}; // Hides it
+      $('img[src="https://cdn.steffesgroup.com/static-files/images/interior/Steffes-Auctioneers-logo.png"]').hide();
+      let oldHeader = document.getElementById('header-content')
+      oldHeader.style.background="#CE0000"
+      let oldHeaderBackground = document.getElementById('header-bg')
+      oldHeaderBackground.style.background="#CE0000"
+
+      steffesLogo.onclick = function(event) {
+        window.location.href = 'https://steffesgroup.com';
+      };
+    try {
+      loginButton.style.marginTop="0px"
+      rightSide.appendChild(loginButton)
+    }
+    catch(err) {console.log('noLoginButton')
+
+
+
     let bidderSearch = document.createElement("INPUT");
     bidderSearch.id="bidderSearch";
     bidderSearch.className='custom-search-input';
@@ -136,6 +160,7 @@
     bidderButton.innerHTML = "Search";
     bidderButton.id="SearhBidderButton";
     bidderButton.className= 'custom-button-for-stuff'
+    bidderButton.style.width= '80px'
 
 
 
@@ -175,7 +200,6 @@
     backendButton.className= 'custom-button-for-stuff custom-admin-button'
     backendButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/AuctionDetails?auctionId=' +AuctionID);});
 
-    leftSide.appendChild(steffesLogo);
     //Creates a button to open the SteffesGroup admin portal.
     if (currentPageUrl.includes('Admin')) {
     } else {
@@ -183,6 +207,7 @@
       adminButton.innerHTML = "Admin Portal";
       adminButton.id="adminButton";
       adminButton.className= 'custom-button-for-stuff'
+      adminButton.style.width= '120px'
       adminButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/Auctions');});
       leftSide.appendChild(adminButton);
     }
@@ -237,12 +262,7 @@
         //Create and append the Go button for the lot listing
         if (arrayOpts.length > 0) rightSide.appendChild(lotBackendGo);
         $(".advancedSearchBtn").hide();}
-
-    try {
-      rightSide.appendChild(loginButton)
-    }
-    catch(err) {}
-    })();
+    }})();
 
 //Get the value from the bidder Search Bar
 function getSearchBidder() {
