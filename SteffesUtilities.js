@@ -5,7 +5,9 @@
 // @description  Adds a few quick-link buttons to the Steffes Group website for admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
+// @match        https://steffesapi.nextlot.com/login/login
 // @grant        none
+// @grant       GM_addStyle
 // ==/UserScript==
 (function() {
 
@@ -31,6 +33,23 @@
     + '.custom-button-for-stuff:hover{'
     + 'background: #fff;'
     + 'color: #000;'
+    + '}'
+    + '.countdownText{'
+    + 'background: #CE0000;'
+    + 'color: #fff;'
+    + 'border-radius: 10px;'
+    + 'border: none;'
+    + 'box-shadow: none;'
+    + 'cursor: pointer;'
+    + 'padding-left: 5px;'
+    + 'margin-right: 5px;'
+    + 'padding-right: 5px;'
+    + 'height: 30px;'
+    + 'font-size: 18px;'
+    + 'z-index: 1033;'
+    + 'outline: none;'
+    + 'display: inline-block;'
+    + 'min-width: 40px;'
     + '}'
     + '.custom-div-parent{'
     + 'display: inline-flex;'
@@ -129,6 +148,30 @@
     steffesLogo.style.cursor="pointer";
     leftSide.appendChild(steffesLogo);
 
+
+    if (currentPageUrl.startsWith('https://steffesapi.nextlot.com/login/login')) {
+      //let nextLotLoginButton = document.getElementsByClassName("btn btn-primary")[0]
+      //rightSide.appendChild(nextLotLoginButton)
+      let countdown = document.createElement('div');
+      countdown.id="countdown";
+      countdown.className= 'countdownText';
+      countdown.style.width='400px'
+      countdown.style.marginTop="-12px"
+      leftSide.appendChild(countdown)
+      var timeleft = 25;
+      var downloadTimer = setInterval(function(){
+        document.getElementById("countdown").innerHTML = "If you are already signed into NextLot, ignore this webpage. It will automatically close in "+ timeleft + " seconds.";
+        timeleft -= 1;
+        if(timeleft < 0){
+          clearInterval(downloadTimer);
+          document.getElementById("countdown").innerHTML = "Finished"
+        }
+}, 1000);
+      setTimeout (window.close, 26000)
+      }
+
+
+
     //Hides mobile site indicators/changes header color if present
     let div = document.getElementById("mobileSiteDiv");
     if (div) {
@@ -159,7 +202,7 @@
       bidderButton.className= 'custom-button-for-stuff'
       bidderButton.style.width= '70px'
 
-
+      //https://steffesapi.nextlot.com/admin/new/login/login#/users?q=
 
       if (currentPageUrl.startsWith('https://steffesgroup.com/Admin/SearchBidder')) {
           //Creates a search bar for searching bidders.
@@ -169,8 +212,12 @@
               event.preventDefault();
               let bidderString = document.getElementById("bidderSearch").value;
               bidderString = bidderString.replace(/ /g,'%20');
-              openInNewTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
-              ;}});
+              openInNewTab('https://steffesapi.nextlot.com/login/login')
+              sleep(0).then(() => {
+                openNewBackgroundTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
+                });
+              };
+              ;});
           bidderButton.addEventListener("click", function() {let bidderString = document.getElementById("bidderSearch").value;
           bidderString = bidderString.replace(/ /g,'%20');
           openInNewTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);});
@@ -263,3 +310,19 @@
 function openInNewTab(url) {
     let win = window.open(url, '_blank');
     win.focus();}
+
+
+function openNewBackgroundTab (url) {
+    var a = document.createElement("a");
+    a.href = url;
+    var evt = document.createEvent("MouseEvents");
+    //the tenth parameter of initMouseEvent sets ctrl key
+    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0,
+                                true, false, false, false, 0, null);
+    a.dispatchEvent(evt);
+}
+
+
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
