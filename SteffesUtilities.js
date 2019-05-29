@@ -264,12 +264,6 @@
         $(".advancedSearchBtn").hide();}
     }})();
 
-//Get the value from the bidder Search Bar
-function getSearchBidder() {
-    let bidderString = document.getElementById("bidderSearch").value;
-    bidderString = bidderString.replace(/ /g,'%20');
-    openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);}
-
 //Opens a url in a new tab
 function openInNewTab(url) {
     let win = window.open(url, '_blank');
