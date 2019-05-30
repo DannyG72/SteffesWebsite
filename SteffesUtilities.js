@@ -155,12 +155,12 @@
       let countdown = document.createElement('div');
       countdown.id="countdown";
       countdown.className= 'countdownText';
-      countdown.style.width='400px'
+      countdown.style.width='530px'
       countdown.style.marginTop="-12px"
       leftSide.appendChild(countdown)
       var timeleft = 25;
       var downloadTimer = setInterval(function(){
-        document.getElementById("countdown").innerHTML = "If you are already signed into NextLot, ignore this webpage. It will automatically close in "+ timeleft + " seconds.";
+        document.getElementById("countdown").innerHTML = "If you are already signed into NextLot, ignore this webpage. It will automatically close in "+ timeleft + " seconds. If the NextLot search tab isn't working, please sign in below.";
         timeleft -= 1;
         if(timeleft < 0){
           clearInterval(downloadTimer);
