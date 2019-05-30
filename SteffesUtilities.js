@@ -155,7 +155,7 @@
       let countdown = document.createElement('div');
       countdown.id="countdown";
       countdown.className= 'countdownText';
-      countdown.style.width='530px'
+      countdown.style.width='600px'
       countdown.style.marginTop="-12px"
       leftSide.appendChild(countdown)
       var timeleft = 25;
@@ -218,10 +218,14 @@
                 });
               };
               ;});
-          bidderButton.addEventListener("click", function() {let bidderString = document.getElementById("bidderSearch").value;
-          bidderString = bidderString.replace(/ /g,'%20');
-          openInNewTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);});
-            } else {
+          bidderButton.addEventListener("click", function() {
+              let bidderString = document.getElementById("bidderSearch").value;
+              bidderString = bidderString.replace(/ /g,'%20');
+              openInNewTab('https://steffesapi.nextlot.com/login/login')
+              sleep(0).then(() => {
+                openNewBackgroundTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
+                });
+              })} else {
         //Creates a search bar for searching bidders.
           bidderSearch.placeholder="Search Bidders...";
           bidderSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
