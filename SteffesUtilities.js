@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
-// @namespace    423048753940261
-// @version      2.5
-// @description  Adds a few quick-link buttons to the Steffes Group website for admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
+// @namespace    https://github.com/DannyG72
+// @version      2.6
+// @description  Adds a few quick-link buttons to the Steffes Group website for quick assistance and admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
 // @match        https://steffesapi.nextlot.com/login/login
-// @grant        none
+// @homepage     https://github.com/DannyG72/SteffesWebsite/blob/master/SteffesUtilities.js
 // @grant       GM_addStyle
 // ==/UserScript==
 (function() {
@@ -76,6 +76,7 @@
     + 'background: #CE0000;'
     + '}'
     + '.custom-left-side{'
+    + 'position: fixed;'
     + 'width: 100%;'
     + 'height: 100%;'
     + 'display: flex;'
@@ -83,6 +84,7 @@
     + 'justify-content: flex-start;'
     + '}'
     + '.custom-right-side{'
+    + 'position: fixed;'
     + 'width: 100%;'
     + 'height: 100%;'
     + 'display: flex;'
@@ -97,7 +99,7 @@
     + '}'
     + '.custom-search-input{'
     + 'height: 30px;'
-    + 'width: 201px;'
+    + 'width: 170px;'
     + 'border-radius: 10px;'
     + 'outline: none;'
     + 'border: none;'
@@ -190,59 +192,72 @@
       rightSide.appendChild(loginButton)
     }
     catch(err) {
+      //Creates a search bar for searching bidders.
       let bidderSearch = document.createElement("INPUT");
       bidderSearch.id="bidderSearch";
       bidderSearch.className='custom-search-input';
       bidderSearch.setAttribute("type", "text");
+      bidderSearch.placeholder="Search Bidders...";
 
       //Creates a go button for activating the search bar.
       let bidderButton = document.createElement("Button");
+      bidderButton.id="bidderButton";
       bidderButton.innerHTML = "Search";
-      bidderButton.id="SearhBidderButton";
       bidderButton.className= 'custom-button-for-stuff'
-      bidderButton.style.width= '70px'
+      bidderButton.style.width= '70px';
 
       //https://steffesapi.nextlot.com/admin/new/login/login#/users?q=
 
       if (currentPageUrl.startsWith('https://steffesgroup.com/Admin/SearchBidder')) {
-          //Creates a search bar for searching bidders.
+        bidderButton.addEventListener("click", function() {let bidderString = document.getElementById("bidderSearch").value;
+        bidderString = bidderString.replace(/ /g,'%20');
+        window.location.href = 'https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString;});
 
-          bidderSearch.placeholder="Nextlot Search Bidders...";
-          bidderSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
-              event.preventDefault();
-              let bidderString = document.getElementById("bidderSearch").value;
-              bidderString = bidderString.replace(/ /g,'%20');
-              openInNewTab('https://steffesapi.nextlot.com/login/login')
-              sleep(0).then(() => {
-                openNewBackgroundTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
-                });
-              };
-              ;});
-          bidderButton.addEventListener("click", function() {
-              let bidderString = document.getElementById("bidderSearch").value;
-              bidderString = bidderString.replace(/ /g,'%20');
-              openInNewTab('https://steffesapi.nextlot.com/login/login')
-              sleep(0).then(() => {
-                openNewBackgroundTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
-                });
-              })} else {
-        //Creates a search bar for searching bidders.
-          bidderSearch.placeholder="Search Bidders...";
-          bidderSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
-              event.preventDefault();
-              let bidderString = document.getElementById("bidderSearch").value;
-              bidderString = bidderString.replace(/ /g,'%20');
-              openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);
-              ;}});
-          bidderButton.addEventListener("click", function() {let bidderString = document.getElementById("bidderSearch").value;
+        bidderSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
+          event.preventDefault();
+          let bidderString = document.getElementById("bidderSearch").value;
           bidderString = bidderString.replace(/ /g,'%20');
-          openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);});
+          window.location.href = 'https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString;
+          ;}});
+
+
+          nextLotBidderButton = document.createElement("Button");
+          nextLotBidderButton.id="nextLotBidderButton";
+          nextLotBidderButton.className= 'custom-button-for-stuff'
+          nextLotBidderButton.innerHTML = "Search NextLot";
+          try {
+            let oldSearch = currentPageUrl.split('SearchText=')[1]
+            oldSearch = oldSearch.replace('%20',' ')
+            oldSearch = toTitleCase(oldSearch)
+            bidderSearch.defaultValue = oldSearch
+          }
+          catch(err) {}
+          nextLotBidderButton.style.width= '140px'
+          nextLotBidderButton.addEventListener("click", function() {
+              let bidderString = document.getElementById("bidderSearch").value;
+              bidderString = bidderString.replace(/ /g,'%20');
+              openInNewTab('https://steffesapi.nextlot.com/login/login')
+              sleep(0).then(() => {
+                openNewBackgroundTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
+                });
+              })}
+      else {
+        bidderSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
+          event.preventDefault();
+          let bidderString = document.getElementById("bidderSearch").value;
+          bidderString = bidderString.replace(/ /g,'%20');
+          openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);
+          ;}});
+
+        bidderButton.addEventListener("click", function() {let bidderString = document.getElementById("bidderSearch").value;
+        bidderString = bidderString.replace(/ /g,'%20');
+        openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);});
       }
 
       //Creates the backend button for an auction page.
       let backendButton = document.createElement("Button");
       backendButton.innerHTML = "View Auction on Backend";
-      bidderButton.id="backendButton";
+      backendButton.id="backendButton";
       backendButton.className= 'custom-button-for-stuff custom-admin-button'
       backendButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/AuctionDetails?auctionId=' +AuctionID);});
 
@@ -260,13 +275,15 @@
 
       leftSide.appendChild(bidderSearch);
       leftSide.appendChild(bidderButton);
+      try {leftSide.appendChild(nextLotBidderButton);}
+      catch(err){}
 
 
       //Checks to see if the current page is an auction page, if so, append auction specific buttons.
       if (currentPageUrl.startsWith('https://steffesgroup.com/Auction/AuctionDetails?Name=')) {
         let lotBackendGo = document.createElement("Button");
         lotBackendGo.innerHTML = "Go";
-        lotBackendGo.id="SearhBidderButton";
+        lotBackendGo.id="lotBackendGo";
         lotBackendGo.className= 'custom-button-for-stuff'
         lotBackendGo.addEventListener("click", function() {
           let selected = selectList.selectedOptions[0].value;
@@ -290,7 +307,8 @@
         if (arrayOpts.length > 0) rightSide.appendChild(selectList);
 
         //Create and append the options to the select list.
-        for (let i = 0; i < arrayOpts.length; i++) {
+        try
+        {for (let i = 0; i < arrayOpts.length; i++) {
           let option = document.createElement("option");
           let lotIDHTML = document.getElementById('lot-container-'+arrayOpts[i]);
           let lotNumber = lotIDHTML.querySelector(`[id*='Lot-']`).outerHTML;
@@ -306,7 +324,8 @@
           if (arrayOpts.length > 0) selectList.appendChild(option);}
 
           //Create and append the Go button for the lot listing
-          if (arrayOpts.length > 0) rightSide.appendChild(lotBackendGo);
+          if (arrayOpts.length > 0) rightSide.appendChild(lotBackendGo);}
+          catch(err) {rightSide.removeChild(selectList)}
           $(".advancedSearchBtn").hide();}
     }})();
 
@@ -326,6 +345,14 @@ function openNewBackgroundTab (url) {
     a.dispatchEvent(evt);
 }
 
+function toTitleCase(str) {
+    return str.replace(
+        /\w\S*/g,
+        function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        }
+    );
+}
 
 function sleep (time) {
   return new Promise((resolve) => setTimeout(resolve, time));
