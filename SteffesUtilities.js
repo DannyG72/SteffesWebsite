@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
 // @namespace    https://github.com/DannyG72
-// @version      2.8
+// @version      2.7
 // @description  Adds a few quick-link buttons to the Steffes Group website for quick assistance and admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
@@ -165,8 +165,9 @@
       countdown.id="countdown";
       countdown.className= 'countdownText';
       countdown.style.width='600px'
+      countdown.style.zIndex ='1035'
       countdown.style.marginTop="-12px"
-      leftSide.appendChild(countdown)
+      parent.appendChild(countdown)
       var timeleft = 25;
       var downloadTimer = setInterval(function(){
         document.getElementById("countdown").innerHTML = "If you are already signed into NextLot, ignore this webpage. It will automatically close in "+ timeleft + " seconds. If the NextLot search tab isn't working, please sign in below.";
@@ -213,8 +214,6 @@
       bidderButton.className= 'custom-button-for-stuff'
       bidderButton.style.width= '70px';
 
-      //https://steffesapi.nextlot.com/admin/new/login/login#/users?q=
-
       if (currentPageUrl.startsWith('https://steffesgroup.com/Admin/SearchBidder')) {
         bidderButton.addEventListener("click", function() {let bidderString = document.getElementById("bidderSearch").value;
         bidderString = bidderString.replace(/ /g,'%20');
@@ -245,7 +244,7 @@
               bidderString = bidderString.replace(/ /g,'%20');
               openInNewTab('https://steffesapi.nextlot.com/login/login')
               sleep(0).then(() => {
-                openNewBackgroundTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
+                openInNewTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
                 });
               })}
       else {
@@ -340,17 +339,6 @@
 function openInNewTab(url) {
     let win = window.open(url, '_blank');
     win.focus();}
-
-
-function openNewBackgroundTab (url) {
-    var a = document.createElement("a");
-    a.href = url;
-    var evt = document.createEvent("MouseEvents");
-    //the tenth parameter of initMouseEvent sets ctrl key
-    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0,
-                                true, false, false, false, 0, null);
-    a.dispatchEvent(evt);
-}
 
 function toTitleCase(str) {
     return str.replace(
