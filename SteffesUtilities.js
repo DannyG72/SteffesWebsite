@@ -87,9 +87,9 @@
     + '}'
     + '.custom-right-side{'
     + 'position: fixed;'
-    + 'width: 40%;'
+    + 'width: 45%;'
     + 'height: 100%;'
-    + 'transform: translate(80%, 0);'
+    + 'transform: translate(70%, 0);'
     + 'display: flex;'
     + 'z-index: 1033;'
     + 'align-items: center;'
@@ -262,10 +262,20 @@
 
       //Creates the backend button for an auction page.
       let backendButton = document.createElement("Button");
-      backendButton.innerHTML = "View Auction on Backend";
+      backendButton.innerHTML = "Backend Page";
       backendButton.id="backendButton";
       backendButton.className= 'custom-button-for-stuff custom-admin-button'
       backendButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/AuctionDetails?auctionId=' +AuctionID);});
+
+      let nextLotBackendButton = document.createElement("Button");
+      nextLotBackendButton.innerHTML = "NextLot Page";
+      nextLotBackendButton.id="nextLotBackendButton";
+      nextLotBackendButton.className= 'custom-button-for-stuff custom-admin-button'
+      let html = content.innerHTML;
+      let tmpListNextLotBackendId = (html.split('data-sale-id="'))[1]
+      let nextLotBackendId = (tmpListNextLotBackendId.split('"'))[0]
+      console.log(nextLotBackendId)
+      nextLotBackendButton.addEventListener("click", function() {openInNewTab('https://steffesapi.nextlot.com/public/sales/'+nextLotBackendId);});
 
       //Creates a button to open the SteffesGroup admin portal.
       if (currentPageUrl.includes('Admin')) {
@@ -301,6 +311,7 @@
           let backendLotLink = 'https://steffesgroup.com/Admin/LotDetails?lotId='+foundLotID;
           openInNewTab(backendLotLink);});
           rightSide.appendChild(backendButton);
+          rightSide.appendChild(nextLotBackendButton);
         //Takes the lotIDS letiable from the SteffesGroup website and splits it into a array to be used for the options in the selection list
         let lotIDS = lotids.split('-');
         lotIDS.pop();
