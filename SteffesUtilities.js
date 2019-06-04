@@ -260,23 +260,6 @@
         openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);});
       }
 
-      //Creates the backend button for an auction page.
-      let backendButton = document.createElement("Button");
-      backendButton.innerHTML = "Backend Page";
-      backendButton.id="backendButton";
-      backendButton.className= 'custom-button-for-stuff custom-admin-button'
-      backendButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/AuctionDetails?auctionId=' +AuctionID);});
-
-      let nextLotBackendButton = document.createElement("Button");
-      nextLotBackendButton.innerHTML = "NextLot Page";
-      nextLotBackendButton.id="nextLotBackendButton";
-      nextLotBackendButton.className= 'custom-button-for-stuff custom-admin-button'
-      let html = content.innerHTML;
-      let tmpListNextLotBackendId = (html.split('data-sale-id="'))[1]
-      let nextLotBackendId = (tmpListNextLotBackendId.split('"'))[0]
-      console.log(nextLotBackendId)
-      nextLotBackendButton.addEventListener("click", function() {openInNewTab('https://steffesapi.nextlot.com/public/sales/'+nextLotBackendId);});
-
       //Creates a button to open the SteffesGroup admin portal.
       if (currentPageUrl.includes('Admin')) {
       } else {
@@ -297,6 +280,23 @@
 
       //Checks to see if the current page is an auction page, if so, append auction specific buttons.
       if (currentPageUrl.startsWith('https://steffesgroup.com/Auction/AuctionDetails?Name=')) {
+        //Creates the backend button for an auction page.
+        let backendButton = document.createElement("Button");
+        backendButton.innerHTML = "Backend Page";
+        backendButton.id="backendButton";
+        backendButton.className= 'custom-button-for-stuff custom-admin-button'
+        backendButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/AuctionDetails?auctionId=' +AuctionID);});
+
+        let nextLotBackendButton = document.createElement("Button");
+        nextLotBackendButton.innerHTML = "NextLot Page";
+        nextLotBackendButton.id="nextLotBackendButton";
+        nextLotBackendButton.className= 'custom-button-for-stuff custom-admin-button'
+        let html = content.innerHTML;
+        let tmpListNextLotBackendId = (html.split('data-sale-id="'))[1]
+        let nextLotBackendId = (tmpListNextLotBackendId.split('"'))[0]
+        console.log(nextLotBackendId)
+        nextLotBackendButton.addEventListener("click", function() {openInNewTab('https://steffesapi.nextlot.com/public/sales/'+nextLotBackendId);});
+
         let lotBackendGo = document.createElement("Button");
         lotBackendGo.innerHTML = "Go";
         lotBackendGo.id="lotBackendGo";
