@@ -287,7 +287,7 @@
         backendButton.className= 'custom-button-for-stuff custom-admin-button'
         backendButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/AuctionDetails?auctionId=' +AuctionID);});
 
-        let nextLotBackendButton = document.createElement("Button");
+        try {let nextLotBackendButton = document.createElement("Button");
         nextLotBackendButton.innerHTML = "NextLot Page";
         nextLotBackendButton.id="nextLotBackendButton";
         nextLotBackendButton.className= 'custom-button-for-stuff custom-admin-button'
@@ -295,7 +295,8 @@
         let tmpListNextLotBackendId = (html.split('data-sale-id="'))[1]
         let nextLotBackendId = (tmpListNextLotBackendId.split('"'))[0]
         console.log(nextLotBackendId)
-        nextLotBackendButton.addEventListener("click", function() {openInNewTab('https://steffesapi.nextlot.com/public/sales/'+nextLotBackendId);});
+        nextLotBackendButton.addEventListener("click", function() {openInNewTab('https://steffesapi.nextlot.com/public/sales/'+nextLotBackendId);});}
+        catch(err){}
 
         let lotBackendGo = document.createElement("Button");
         lotBackendGo.innerHTML = "Go";
@@ -311,7 +312,7 @@
           let backendLotLink = 'https://steffesgroup.com/Admin/LotDetails?lotId='+foundLotID;
           openInNewTab(backendLotLink);});
           rightSide.appendChild(backendButton);
-          rightSide.appendChild(nextLotBackendButton);
+          try{rightSide.appendChild(nextLotBackendButton);}catch(err){}
         //Takes the lotIDS letiable from the SteffesGroup website and splits it into a array to be used for the options in the selection list
         let lotIDS = lotids.split('-');
         lotIDS.pop();
