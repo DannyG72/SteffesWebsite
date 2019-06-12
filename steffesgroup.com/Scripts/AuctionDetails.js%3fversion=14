@@ -1,0 +1,1374 @@
+/**
+Javscript file used for SignalR
+*/
+
+var lotids;
+var serverResponse = 0;
+
+let style = document.createElement('style');
+style.type='text/css';
+style.innerHTML = '.custom-button-for-stuff{'
++ 'background: #CE0000;'
++ 'color: #fff;'
++ 'border-radius: 10px;'
++ 'border: none;'
++ 'box-shadow: none;'
++ 'cursor: pointer;'
++ 'padding-left: 5px;'
++ 'margin-right: 5px;'
++ 'padding-right: 5px;'
++ 'height: 30px;'
++ 'font-size: 18px;'
++ 'z-index: 1034;'
++ 'outline: none;'
++ 'display: inline-block;'
++ 'min-width: 40px;'
++ '}'
++ '.custom-button-for-stuff:hover{'
++ 'background: #fff;'
++ 'color: #000;'
++ '}'
++ '.countdownText{'
++ 'background: #CE0000;'
++ 'color: #fff;'
++ 'border-radius: 10px;'
++ 'border: none;'
++ 'box-shadow: none;'
++ 'cursor: pointer;'
++ 'padding-left: 5px;'
++ 'margin-right: 5px;'
++ 'padding-right: 5px;'
++ 'height: 30px;'
++ 'font-size: 18px;'
++ 'z-index: 1034;'
++ 'outline: none;'
++ 'display: inline-block;'
++ 'min-width: 40px;'
++ '}'
++ '.custom-div-parent{'
++ 'display: inline-flex;'
++ 'align-items: center;'
++ 'justify-content: center;'
++ 'position: fixed;'
++ 'width: 955px;'
++ 'height: 60px;'
++ 'top: 0;'
++ 'left: 50%;'
++ 'transform: translate(-50%, 0);'
++ 'z-index: 1032;'
++ 'background: #CE0000;'
++ '}'
++ '.custom-div-grandParent{'
++ 'display: inline-flex;'
++ 'align-items: center;'
++ 'justify-content: center;'
++ 'position: fixed;'
++ 'width: 100%;'
++ 'height: 60px;'
++ 'top: 0;'
++ 'z-index: 1032;'
++ 'background: #CE0000;'
++ '}'
++ '.custom-left-side{'
++ 'position: fixed;'
++ 'width: 65%;'
++ 'height: 100%;'
++ 'display: flex;'
++ 'transform: translate(-28%, 0);'
++ 'z-index: 1033;'
++ 'align-items: center;'
++ 'justify-content: flex-start;'
++ '}'
++ '.custom-right-side{'
++ 'position: fixed;'
++ 'width: 45%;'
++ 'height: 100%;'
++ 'transform: translate(67%, 0);'
++ 'display: flex;'
++ 'z-index: 1033;'
++ 'align-items: center;'
++ 'justify-content: flex-end;'
++ '}'
++ '.custom-admin-button{'
++ 'justify-self: center;'
++ 'min-width: 113px; !important'
++ 'z-index: 1034;'
++ 'padding-left: 10px;'
++ 'display: inline-block;'
++ '}'
++ '.custom-search-input{'
++ 'height: 30px;'
++ 'width: 170px;'
++ 'z-index: 1034;'
++ 'border-radius: 10px;'
++ 'outline: none;'
++ 'border: none;'
++ 'box-shadow: none;'
++ 'padding-left: 10px;'
++ 'margin-right: 5px;'
++ 'font-size: 18px;'
++ '}'
++ '.custom-select-input{'
++ 'width: 100px;'
++ 'height: 30px;'
++ 'font-size: 18px;'
++ 'outline: none;'
++ 'z-index: 1034;'
++ 'margin-right: 5px;'
++ 'border-radius: 10px;'
++ '}'
+    
+function StartSignalR(url, lotidslist)
+{
+    // Reference the auto-generated proxy for the hub.
+    $.connection.hub.url = url;
+
+    lotids = lotidslist;
+    var serverResponse = 0;
+    var messageShown = false;
+    var tryingToReconnect = false;
+    var hubConnected = false;
+    var chat = $.connection.bidHub;
+    $.connection.hub.logging = true;
+  //  $.connection.hub.qs = "lotids=" + lotids;
+
+    $.connection.hub.error(function () {
+        console.log("error event");
+        window.setTimeout(function () {
+            console.log("timeout elapsed, connection status: " + tryingToReconnect);
+            if (tryingToReconnect == true) {
+                messageShown = true;
+                var n = noty({
+                    text: "There was a problem connecting to the live update server. Attempts to reconnect will be made automatically.<br/>Click this message to close.",
+                    layout: 'center',
+                    type: 'warning',
+                    callback: {
+                        onClose: function () {
+                            location.reload();
+                        }
+                    }
+                });
+               
+            }
+            $.connection.hub.stop();
+            $.connection.hub.start();
+        }, 5000);
+
+
+
+    });
+
+
+    $.connection.hub.connectionSlow(function ()
+    {
+        //restart connection if it's slow
+        //prevent popup
+       
+        $.connection.hub.stop();
+        $.connection.hub.start();
+     
+    });
+    
+    $.connection.hub.reconnecting(function () {
+        hubConnected = false;
+        tryingToReconnect = true;
+    });
+  
+    $.connection.hub.reconnected(function() {
+        tryingToReconnect = false;
+        hubConnected = true;
+        messageShown = true;
+        //   var n = noty({text:"Successfully reconnected to live update server.", layout: 'center', type: 'Success'});
+
+    });
+    $.connection.hub.disconnected(function() {
+        if(tryingToReconnect) {
+            //  alert("You have been disconnected from the update server and will no longer recieve live updates. Please refresh the page to reconnect. (3)");
+            StopTimers();
+            $("#ConnectionStatus").text("Disconnected!");
+            $("#AuctionConnectionStatus").removeClass("ConnectionStatusGreen");
+            $("#AuctionConnectionStatus").addClass("ConnectionStatusRed");
+			$('#ConnectionImg').attr('src', 'https://steffescdn.azureedge.net/static-files/images/interior/disconnected.png');
+            var n = noty({
+                text: "You have been disconnected from the update server and will no longer recieve live updates. <br/> Please refresh the page to reconnect.",
+                layout: 'center',
+                type: 'error',
+                callback: {
+                    onClose: function () {
+                        location.reload();
+                    }
+                }
+            });
+        }
+    });
+
+    // Create a function that the hub can call back to display messages.
+    chat.client.newBidToDeliver = function (lotid, bidjson) {
+        // Add the message to the page.
+
+        if (lotids.indexOf(lotid) > -1) {
+            var jsonData = JSON.parse(bidjson);
+        //Getting the Current Bid String
+        var currentBid = jsonData["CurrentBid"]
+        // var currentBidInt = parseInt(currentBid.replace('*','').replace('$','').replace(',','').replace('.00',''))
+        // var pastBidInt = parseInt(jsonData.BidHistory[1]['BidAmount'].replace('*','').replace('$','').replace(',','').replace('.00',''))
+        // var percentChange = (((currentBidInt-pastBidInt)/pastBidInt)*100)
+
+        //Getting the Current Auction Time Remaining
+        var ms = jsonData["LotClosingTime"]
+        var timeRemainingString = "";
+        var days = Math.floor(ms / (24*60*60*1000));
+        var daysms=ms % (24*60*60*1000);
+        var hours = Math.floor((daysms)/(60*60*1000));
+        var hoursms=ms % (60*60*1000);
+        var minutes = Math.floor((hoursms)/(60*1000));
+        var minutesms=ms % (60*1000);
+        var sec = Math.floor((minutesms)/(1000));
+        var timeRemainingString = "";
+        if (days > 0) {
+            timeRemainingString = (days+ 'd, ');
+        }
+        if (hours > 0) {
+
+            timeRemainingString += (hours+'h, ');
+        }
+        if (minutes > 0) {
+            timeRemainingString += (minutes+'m, ');
+        }
+        if (sec > 0) {
+
+            timeRemainingString += (sec+'s.');
+        }
+
+        //Getting the Visible Bid Count String
+        var currentBidCount = jsonData["DisplayBidNumber"]
+
+        //Getting the Total Bid Count String
+        var currentBidTotalCount = jsonData["TotalBids"]
+
+        //Getting the current lotID
+        var currentLotID = jsonData["LotId"]
+        var backendLink = 'https://steffesgroup.com/Admin/LotDetails?lotId='+currentLotID;
+
+        //Finding the Lot Number on the Page
+        var lotIDHTML = document.getElementById('lot-container-'+currentLotID);
+        var lotNumber = lotIDHTML.querySelector(`[id*='Lot-']`).outerHTML;
+        var tmpStr = lotNumber;
+        var tmpListCurrentLot = tmpStr.split('<span id="');
+        var tmpStrCurrentLot = tmpListCurrentLot.slice(1);
+        var currentLot = tmpStrCurrentLot.pop(0);
+        var tmpListCurrentLot2 = currentLot.split('" class="lot-number-heading')
+        var currentLot = tmpListCurrentLot2[0]
+
+        // Finding the current date and time for the bid.
+
+        var today = new Date();
+        var bidTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+        //Getting the total number of Closing auctions on page.
+        var closingArray = (
+        (
+        document.documentElement.textContent || document.documentElement.innerText
+        ).match(/Closing: In /g))
+        var closingCount = closingArray.length;
+
+        //Getting the number of extended closing auctions on the page.
+        try {
+            var extendedClosingArray = (
+            (
+            document.documentElement.textContent || document.documentElement.innerText
+            ).match(/Extended Bidding Closing: In /g))
+            var extendedClosingCount = extendedClosingArray.length;
+        }
+        catch(err) {
+            extendedClosingCount = 0
+        }
+
+//         let bidBox = document.createElement('div')
+//         bidBox.id="bidBox";
+//         bidBox.style.width='600px'
+//         bidBox.style.height='400px'
+//         bidBox.className= 'custom-div-grandParent'
+//         bidBox.className= 'custom-button-for-stuff'
+//         bidBox.className= 'countdownText';
+//         bidBox.style.zIndex ='1040'
+//         bidBox.style.marginTop="12px"
+//         document.body.appendChild(bidBox)
+//         document.getElementById("bidBox").innerHTML = currentLot+': Bid:', currentBid+',', 'placed at', bidTime+'\n'+
+//             'Bid Count: '+parseInt(currentBidTotalCount), 'Time Remaining: '+timeRemainingString+'\n'+
+//             'Backend Link:', backendLink+'\n'+'On this page there are '+ parseInt(closingCount)+' open auctions and '+parseInt(extendedClosingCount)+' of them are in extended.'
+        
+//         $( "div.bidBox" ).fadeIn( 300 ).delay( 1500 ).fadeOut( 400 );;
+
+        console.log(
+            currentLot+': Bid:', currentBid+',', 'placed at', bidTime+'\n'+
+            'Bid Count: '+parseInt(currentBidTotalCount), 'Time Remaining: '+timeRemainingString+'\n'+
+            'Backend Link:', backendLink+'\n'+'On this page there are '+ parseInt(closingCount)+' open auctions and '+parseInt(extendedClosingCount)+' of them are in extended.');
+
+        InsertBid(bidjson);
+        }
+    };
+    chat.client.ServerHeartBeat = function (status) {
+        //console.log("heartbeat check: server reponse - " + status);
+        if (status == 2) {
+            serverResponse = 2;
+            $("#ConnectionStatus").text("Connected!");
+            $("#AuctionConnectionStatus").removeClass("ConnectionStatusRed");
+            $("#AuctionConnectionStatus").addClass("ConnectionStatusGreen");
+			$('#ConnectionImg').attr('src', 'https://steffescdn.azureedge.net/static-files/images/interior/connected2.png');
+        }
+    }
+
+    chat.client.extendedLotNotification = function (bidjson) {
+        // Add the message to the page.
+        var jsonData = JSON.parse(bidjson);
+        if (lotids.indexOf(jsonData.LotId) > -1) {
+            console.log("Extension message");
+            ExtendLot(bidjson);
+        }
+    };
+
+    chat.client.suspendedAuctionNotification = function (auctionId, unsuspend) {
+        if (auctionId == auctionid) {
+            StopTimers();
+            if (unsuspend == "true") {
+                var n = noty({
+                    text: "A new close time has been set for this auction. <br/> Please refresh the page.",
+                    layout: 'center',
+                    type: 'error',
+                    callback: {
+                        onClose: function () {
+                            location.reload();
+                        }
+                    }
+                });
+            }
+            else {
+                var n = noty({
+                    text: "This auction has been suspended. <br/> Please refresh the page.",
+                    layout: 'center',
+                    type: 'error',
+                    callback: {
+                        onClose: function () {
+                            location.reload();
+                        }
+                    }
+                });
+            }
+          
+        }
+    }
+
+    chat.client.bidderNotification = function (auctionId, message) {
+        if (auctionId == auctionid) {
+            var n = noty({ text: message, layout: 'center', type: 'error' });
+        }
+    }
+
+    chat.client.Hello = function (data) {
+        // Add the message to the page.
+        alert(data);
+    };
+
+    // Start the connection.
+    $.connection.hub.start().done(function () {
+        // Ping every 10s
+        intervalHandle = setInterval(function () {
+            // Ensure we're connected (don't want to be pinging in any other state).
+            //console.log("heartbeat check: serverResponse: " + serverResponse);
+            var chat = $.connection.bidHub;
+            if (serverResponse != 3) {
+                //console.log("heartbeat check: calling checkConnection");
+                    chat.server.checkConnection().fail(function () {
+                        // Failed to ping the server, we could either try one more time to ensure we can't reach the server
+                        //  var n = noty({ text: "You have been disconnected from the update server and will no longer receive live updates. Please refresh the page to reconnect.", layout: 'center', type: 'warning' });
+                    
+                    });
+                }
+                else if (serverResponse != 2) {
+                   
+                        //console.log("heartbeat check: failure state");
+                        StopTimers();
+                        $("#ConnectionStatus").text("Disconnected!");
+                        $("#AuctionConnectionStatus").removeClass("ConnectionStatusGreen");
+                        $("#AuctionConnectionStatus").addClass("ConnectionStatusRed");
+						$('#ConnectionImg').attr('src', 'https://steffescdn.azureedge.net/static-files/images/interior/disconnected.png');
+                        var n = noty({ text: "You have been disconnected from the update server and will no longer receive live updates. Please refresh the page to reconnect.", layout: 'center', type: 'warning' });
+                        clearInterval(intervalHandle);
+
+
+                
+                 
+                }
+                serverResponse = 3;
+          
+        }, 10000);
+
+
+
+
+    });
+}
+
+function StartSignalRNextLot(url, lotidslist) {
+    // Same as normal signalR setup except with no bid extension
+
+    // Reference the auto-generated proxy for the hub.
+    $.connection.hub.url = url;
+
+    lotids = lotidslist;
+    var serverResponse = 0;
+    var messageShown = false;
+    var tryingToReconnect = false;
+    var hubConnected = false;
+    var chat = $.connection.bidHub;
+    //we dont want bids inserted or other things going on for a nextlot auction
+
+    $.connection.hub.logging = true;
+    //  $.connection.hub.qs = "lotids=" + lotids;
+
+    $.connection.hub.error(function () {
+        console.log("error event");
+        window.setTimeout(function () {
+            console.log("timeout elapsed, connection status: " + tryingToReconnect);
+            if (tryingToReconnect == true) {
+                messageShown = true;
+                var n = noty({ text: "There was a problem connecting to the live update server. Attempts to reconnect will be made automatically.<br/>Click this message to close.", layout: 'center', type: 'warning' });
+
+            }
+            $.connection.hub.stop();
+            $.connection.hub.start();
+        }, 5000);
+
+
+
+    });
+
+
+    $.connection.hub.connectionSlow(function () {
+        //restart connection if it's slow
+        //prevent popup
+
+        $.connection.hub.stop();
+        $.connection.hub.start();
+
+    });
+
+    $.connection.hub.reconnecting(function () {
+        hubConnected = false;
+        tryingToReconnect = true;
+    });
+    $.connection.hub.reconnected(function () {
+        tryingToReconnect = false;
+        hubConnected = true;
+        messageShown = true;
+        //   var n = noty({text:"Successfully reconnected to live update server.", layout: 'center', type: 'Success'});
+
+    });
+    chat.client.extendedLotNotification = function (bidjson) {
+        // Add the message to the page.
+        var jsonData = JSON.parse(bidjson);
+        if (lotids.indexOf(jsonData.LotId) > -1) {
+            
+            ExtendLot(bidjson);
+        }
+    };
+
+
+    $.connection.hub.disconnected(function () {
+        if (tryingToReconnect) {
+            //  alert("You have been disconnected from the update server and will no longer recieve live updates. Please refresh the page to reconnect. (3)");
+            //StopTimers();
+            var n = noty({ text: "You have been disconnected from the update server and will no longer recieve live updates. <br/> Please refresh the page to reconnect.", layout: 'center', type: 'error' });
+
+        }
+    });
+
+    // Create a function that the hub can call back to display messages.
+    chat.client.newBidToDeliver = function (lotid, bidjson) {
+        // Add the message to the page.
+
+        //if it's nextlot we dont need this
+        if (lotids.indexOf(lotid) > -1) {
+
+            //    InsertBid(bidjson);
+
+        }
+    };
+
+    chat.client.suspendedAuctionNotification = function (auctionId, unsuspend) {
+        if (auctionId == auctionid) {
+            if (unsuspend == "true") {
+                var n = noty({ text: "A new close time has been set for this auction. <br/> Please refresh the page.", layout: 'center', type: 'error' });
+            }
+            else {
+                var n = noty({ text: "This auction has been suspended. <br/> Please refresh the page.", layout: 'center', type: 'error' });
+            }
+            //StopTimers();
+        }
+    }
+
+    chat.client.bidderNotification = function (auctionId, message) {
+        if (auctionId == auctionid) {
+            var n = noty({ text: message, layout: 'center', type: 'error' });
+        }
+    }
+
+    chat.client.Hello = function (data) {
+        // Add the message to the page.
+        alert(data);
+    };
+
+    // Start the connection.
+    $.connection.hub.start();
+}
+
+function AddLotSignalR(lotid) {
+
+    lotids = lotids + lotid + '-';
+
+}
+
+function StopTimers() {
+    //brute force clear the interval since the obj isn't exactly saved somewhere nice
+    for (var i = 1; i < 1000; i++) {
+        window.clearInterval(i);
+    }
+    var lots = lotids.split('-');
+    for (var lot in lots){
+        timeText = "Disconnected";
+        $("#DateText-" + lots[lot]).text(timeText);
+        $("#DateTextSingleLot-" + lots[lot]).text(timeText);
+    }
+    // clear list of lots and time array to stop signalR and timers from running
+    lotids = "";
+    if (ClosingTimeArray) {
+        ClosingTimeArray.length = 0;
+    }
+}
+
+
+function StartAutoScrolling() {
+    var $aside = $('#left-sidebar'),
+             asideOffset = $aside.offset(),
+             $window = $(window),
+             gap = $('#auctionNavigation').css('marginBottom').replace(/[^-\d\.]/g, ''),
+             distance = ($window.scrollTop()) - (asideOffset.top - gap),
+             footerHeight = $('#footer').outerHeight();
+
+    //console.log('Aside offset is ' + asideOffset.top);
+    //console.log('Window offset is ' + $window.scrollTop());
+    //console.log('Gap is ' + gap);
+    //console.log('The exact distance is ' + distance);
+
+    $window.scroll(function () {
+        distance = ($window.scrollTop()) - (asideOffset.top - gap);
+        if (distance > -100) {
+            $aside.css({ 'top': gap + 46 + 'px', 'position': 'fixed', 'left': 'auto' });
+        } else {
+            $aside.css({ 'top': '0', 'position': 'relative', 'left': 'auto' });
+        }
+        if ($('#left-sidebar').offset().top + $('#left-sidebar').outerHeight() > $("#footer").position().top) {
+
+            // handle situation
+
+            var num2 = $("#maincontent-bg").height();
+            var sidebarheight = $('#left-sidebar').height();
+
+            $aside.css({ 'top': (num2 - sidebarheight - 20), 'position': 'relative', 'left': 'auto' });
+            // $('#left-sidebar').css("margin-top", (num2 - sidebarheight) + "px");
+        }
+    });
+
+
+
+
+    var $asideb = $('#auctions-nav-bg'),
+     asideOffsetb = $asideb.offset(),
+     $windowb = $(window),
+     gapb = $('#auctionNavigation').css('marginBottom').replace(/[^-\d\.]/g, ''),
+     distanceb = ($windowb.scrollTop()) - (asideOffsetb.top - gapb),
+     footerHeightb = $('#footer').outerHeight();
+
+
+    //console.log('Aside offset is ' + asideOffsetb.top);
+    //console.log('Window offset is ' + $windowb.scrollTop());
+    //console.log('Gap is ' + gapb);
+    //console.log('The exact distance is ' + distanceb);
+
+    var $welcome = $('#headerHeader');
+    var $searchIcon = $('.advancedSearchTopIcon');
+
+    $windowb.scroll(function () {
+        distanceb = ($windowb.scrollTop()) - (asideOffsetb.top - gapb);
+        if (distanceb > 0) {
+            $asideb.css({ 'top': gapb + 'px', 'position': 'fixed' });
+            $asideb.removeClass("auctions-nav-bg");
+            $asideb.addClass("auctions-nav-bg2");
+            $welcome.addClass("white");
+            $searchIcon.addClass("white");
+            if (!$('#TopNavAuctions').hasClass("auctions-nav-top-header-selected")) {
+                $("#TopNavAuctions").removeClass("auctions-nav-top-header");
+                $("#TopNavAuctions").addClass("auctions-nav-top-header2");
+            }
+            else {
+                $("#TopNavAuctions").removeClass("auctions-nav-top-header-selected");
+                $("#TopNavAuctions").addClass("auctions-nav-top-header-selected2");
+            }
+
+            if (!$('#TopNavTimedOnline').hasClass("auctions-nav-top-header-selected")) {
+                $("#TopNavTimedOnline").removeClass("auctions-nav-top-header");
+                $("#TopNavTimedOnline").addClass("auctions-nav-top-header2");
+            }
+            else {
+                $("#TopNavTimedOnline").removeClass("auctions-nav-top-header-selected");
+                $("#TopNavTimedOnline").addClass("auctions-nav-top-header-selected2");
+            }
+            if (!$('#TopNavLiveOnsite').hasClass("auctions-nav-top-header-selected")) {
+                $("#TopNavLiveOnsite").removeClass("auctions-nav-top-header");
+                $("#TopNavLiveOnsite").addClass("auctions-nav-top-header2");
+            }
+            else {
+                $("#TopNavLiveOnsite").removeClass("auctions-nav-top-header-selected");
+                $("#TopNavLiveOnsite").addClass("auctions-nav-top-header-selected2");
+            }
+            if (!$('#TopNavRealEstate').hasClass("auctions-nav-top-header-selected")) {
+                $("#TopNavRealEstate").removeClass("auctions-nav-top-header");
+                $("#TopNavRealEstate").addClass("auctions-nav-top-header2");
+            }
+            else {
+                $("#TopNavRealEstate").removeClass("auctions-nav-top-header-selected");
+                $("#TopNavRealEstate").addClass("auctions-nav-top-header-selected2");
+            }
+            if (!$('#TopNavArchived').hasClass("auctions-nav-top-header-selected")) {
+                $("#TopNavArchived").removeClass("auctions-nav-top-header");
+                $("#TopNavArchived").addClass("auctions-nav-top-header2");
+            }
+            else {
+                $("#TopNavArchived").removeClass("auctions-nav-top-header-selected");
+                $("#TopNavArchived").addClass("auctions-nav-top-header-selected2");
+            }
+        } else {
+            $asideb.css({ 'top': '0', 'position': 'inherit' });
+            $asideb.removeClass("auctions-nav-bg2");
+            $asideb.addClass("auctions-nav-bg");
+            $welcome.removeClass("white");
+            $searchIcon.removeClass("white");
+            if (!$('#TopNavAuctions').hasClass("auctions-nav-top-header-selected2")) {
+                $("#TopNavAuctions").removeClass("auctions-nav-top-header2");
+                $("#TopNavAuctions").addClass("auctions-nav-top-header");
+            }
+            else {
+                $("#TopNavAuctions").removeClass("auctions-nav-top-header-selected2");
+                $("#TopNavAuctions").addClass("auctions-nav-top-header-selected");
+            }
+
+            if (!$('#TopNavTimedOnline').hasClass("auctions-nav-top-header-selected2")) {
+                $("#TopNavTimedOnline").removeClass("auctions-nav-top-header2");
+                $("#TopNavTimedOnline").addClass("auctions-nav-top-header");
+            }
+            else {
+                $("#TopNavTimedOnline").removeClass("auctions-nav-top-header-selected2");
+                $("#TopNavTimedOnline").addClass("auctions-nav-top-header-selected");
+            }
+            if (!$('#TopNavLiveOnsite').hasClass("auctions-nav-top-header-selected2")) {
+                $("#TopNavLiveOnsite").removeClass("auctions-nav-top-header2");
+                $("#TopNavLiveOnsite").addClass("auctions-nav-top-header");
+            }
+            else {
+                $("#TopNavLiveOnsite").removeClass("auctions-nav-top-header-selected2");
+                $("#TopNavLiveOnsite").addClass("auctions-nav-top-header-selected");
+            }
+            if (!$('#TopNavRealEstate').hasClass("auctions-nav-top-header-selected2")) {
+                $("#TopNavRealEstate").removeClass("auctions-nav-top-header2");
+                $("#TopNavRealEstate").addClass("auctions-nav-top-header");
+            }
+            else {
+                $("#TopNavRealEstate").removeClass("auctions-nav-top-header-selected2");
+                $("#TopNavRealEstate").addClass("auctions-nav-top-header-selected");
+            }
+            if (!$('#TopNavArchived').hasClass("auctions-nav-top-header-selected2")) {
+                $("#TopNavArchived").removeClass("auctions-nav-top-header2");
+                $("#TopNavArchived").addClass("auctions-nav-top-header");
+            }
+            else {
+                $("#TopNavArchived").removeClass("auctions-nav-top-header-selected2");
+                $("#TopNavArchived").addClass("auctions-nav-top-header-selected");
+            }
+
+        }
+        if ($('#auctions-nav-bg').offset().top + $('#auctions-nav-bg').outerHeight() > $("#footer").position().top) {
+            // handle situation
+
+            var num2 = $("#maincontent-bg").height();
+            var sidebarheight = $('#auctions-nav-bg').height();
+
+            $asideb.css({ 'top': (num2 - sidebarheight) });
+            // $('#auctions-nav-bg').css("margin-top", (num2 - sidebarheight) + "px");
+        }
+
+
+    });
+
+}
+
+function slideDownPicture(imagepath, clickedId, pictureGalleryId, PhototableId) {
+    var ul = document.getElementById(pictureGalleryId);
+    var items = ul.getElementsByTagName("li");
+    for (var i = 0; i < items.length; ++i) {
+        if (items[i].id == "p+" + imagepath) {
+            items[i].style.display = 'block';
+        }
+        else {
+            items[i].style.display = 'none';
+        }
+    }
+
+    var table = document.getElementById(PhototableId);
+    var tableItems = table.getElementsByTagName("td");
+    for (var i = 0; i < tableItems.length; ++i) {
+        if (tableItems[i].id == clickedId) {
+            tableItems[i].className = "SelectedPhoto";
+        }
+        else {
+            tableItems[i].className = "";
+        }
+
+
+    }
+
+
+}
+function toggleInfo(uniqueId, isphotos, auctionId) {
+
+    if (isphotos != 4) {
+        $("#more-info-" + uniqueId).show();
+    }
+    if (isphotos == 1) {
+        $.ajaxSetup({
+            // Disable caching of AJAX responses
+            cache: false
+        });
+        $("#more-photos-" + uniqueId).addClass("loadingimg");
+        $("#more-photos-" + uniqueId).show();
+        var lotid = $("#more-photos-" + uniqueId).data("lotid");
+        var auctid = $("#more-photos-" + uniqueId).data("auctionid");
+        $("#more-photos-" + uniqueId).load('/Auction/GetMorePhotosSection?lotid=' + lotid + '&uniqueId=' + uniqueId + '&auctionId=' + auctid, function () {
+            loadMyPrettyPhoto();
+        });
+        $("#more-photos-" + uniqueId).removeClass("loadingimg");
+        $("#map-" + uniqueId).hide();
+        $("#BiddingIframeDiv-" + uniqueId).hide();
+        $("#lot-video-" + uniqueId).hide();
+        $("#infoContainer-" + uniqueId).hide();
+        $("#BiddingHistoryContainer-" + uniqueId).hide();
+        $("#BiddingIframeDivDisabled-" + uniqueId).hide();
+        $('html,body').animate({ scrollTop: $("#more-photos-" + uniqueId).offset().top - 80 }, 1000);
+    }
+    else if (isphotos == 2) {
+        $("#map-" + uniqueId).show();
+        $("#iframe-" + uniqueId).prop('src', '/Auction/LotMapView?LotId=' + auctionId);
+        $("#more-photos-" + uniqueId).hide();
+        $("#BiddingIframeDiv-" + uniqueId).hide();
+        $("#infoContainer-" + uniqueId).hide();
+        $("#BiddingIframeDivDisabled-" + uniqueId).hide();
+        $("#BiddingHistoryContainer-" + uniqueId).hide();
+        $("#lot-video-" + uniqueId).hide();
+
+    }
+    else if (isphotos == 3) {
+        $("#more-photos-" + uniqueId).hide();
+        $("#map-" + uniqueId).hide();
+        $("#infoContainer-" + uniqueId).hide();
+        $("#BiddingHistoryContainer-" + uniqueId).show();
+        $("#BiddingIframeDiv-" + uniqueId).hide();
+        $("#BiddingIframeDivDisabled-" + uniqueId).hide();
+        $("#lot-video-" + uniqueId).hide();
+
+    }
+    else if (isphotos == 4) {
+
+        if (CurrentBidderNumber != 0) {
+            $("#map-" + uniqueId).hide();
+
+            if (cookieLoaded == true) {
+                var wnd = $("#BiddingFrame").data("kendoWindow");
+                //wnd.bind("refresh", function () {
+                //    $("#BiddingIframeDivDisabled-" + uniqueId).hide();
+                //    $("#maximum-" + uniqueId).show();
+                //    $("#maximum-" + uniqueId).focus();
+                //});
+                wnd.refresh({
+                    url: "/Auction/AuctionBiddingIframe",
+                    data: { id: auctionId, UniqueId: uniqueId }
+                });
+                wnd.center().open();
+                //    .element.closest(".k-window").css({
+                //    top: 50
+                //});
+                //$("#bidding-" + uniqueId).load('/Auction/AuctionBiddingIframe?id=' + auctionId + '&UniqueId=' + uniqueId);
+                //$("#BiddingIframeDiv-" + uniqueId).show();
+                //$("#BiddingIframeDivDisabled-" + uniqueId).hide();
+                //$("#maximum-" + uniqueId).show();
+                //$("#maximum-" + uniqueId).focus();
+                //$("#maximum-" + uniqueId).focus();
+                //$("#maximum-" + uniqueId).blur();
+                //$("#maximum-" + uniqueId).hide();
+
+            }
+            else {
+                $("#BiddingIframeDivDisabled-" + uniqueId).show();
+                $("#BiddingIframeDiv-" + uniqueId).hide();
+            }
+
+            $("#more-photos-" + uniqueId).hide();
+            $("lot-video-" + uniqueId).hide();
+            $("#infoContainer-" + uniqueId).hide();
+            $("#BiddingHistoryContainer-" + uniqueId).hide();
+                
+        }
+        else {
+            $("#more-info-" + uniqueId).hide();
+            alert("Please log in to use this feature.");
+        }
+
+    }
+    else if (isphotos == 5)
+    {
+        $("#more-photos-" + uniqueId).hide();
+        $("#map-" + uniqueId).hide();
+        $("#BiddingIframeDiv-" + uniqueId).hide();
+        $("#infoContainer-" + uniqueId).hide();
+        $("#BiddingIframeDivDisabled-" + uniqueId).hide();
+        $("#lot-video-" + uniqueId).show();
+        var uid = $("#lot-video-" + uniqueId).data("videosource");
+        var loaded = $("#lot-video-" + uniqueId).data("vidloaded");
+        if(loaded == 0)
+        {
+            $("#lot-video-" + uniqueId).load("/Auction/LoadLotVideo?UniqueId="+uniqueId+"&VideoSource="+uid,function () {
+                $("#lot-video-" + uniqueId).data("vidloaded", 1);
+
+            });
+        }
+
+        $("#BiddingHistoryContainer-" + uniqueId).hide();
+        $('html,body').animate({ scrollTop: $("#lot-video-" + uniqueId).offset().top - 80 }, 1000);
+    }
+    else {
+        $("#more-photos-" + uniqueId).hide();
+        $("#map-" + uniqueId).hide();
+        $("#BiddingIframeDiv-" + uniqueId).hide();
+        $("#infoContainer-" + uniqueId).show();
+        $("#BiddingIframeDivDisabled-" + uniqueId).hide();
+        $("#lot-video-" + uniqueId).hide();
+        $("#BiddingHistoryContainer-" + uniqueId).hide();
+    }
+    return false;
+
+}
+function hideInfo(control) {
+
+    var uid = $(control).data("uniqueid");
+    try
+    {
+
+        $('html,body').animate({ scrollTop: $("#datatablestart" + uid).offset().top - 80 }, 500);
+
+        document.getElementById('video-' + uid).pause();
+
+    }catch(err){}
+
+    $(control).hide();
+
+    return false;
+
+}
+
+function addNotification(containerId, args) {
+    var flag = false;
+
+    $(containerId + " ul li div span").each(function (i) {
+        if ($(this).text() === args.text) {
+            flag = true;
+        } else if ($(this).text().indexOf('Please confirm your bid') == 0 && args.text.indexOf('Please confirm your bid') == 0) {
+            flag = true;
+            $(this).text(args.text);
+        }
+    });
+    if (!flag) {
+        $(containerId).noty(args); 
+    }
+}
+
+function validateIncrementAmount(lotid, uniqueid, bidIncrements) {
+    //console.log("lotID", lotid);
+   // console.log("uniqueId", uniqueid);
+    //console.log("bidIncrements", bidIncrements);
+   // console.log("bidIncrement length", Object.keys(bidIncrements).length)
+    var hasFormatterError = false;
+
+    try {
+        var formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+        });
+    }
+    catch (error) {
+        hasFormatterError = true;
+    }
+
+    var enteredAmount = $("#BidAreaAmount-" + uniqueid).val();
+    var enteredAmountFormatted = Number(enteredAmount.replace(/[^0-9\.-]+/g, ""));
+    var maxAmount = $("#BidAreaAmount-" + uniqueid).data("minimumbid");
+	//assigning first increment from the list as previous increment 
+	var previousIncrement = encodedBidIncrements[0].Increment;
+	// looping through to get the right increment if there is any
+	for (increment in encodedBidIncrements) {
+
+		if (enteredAmountFormatted < encodedBidIncrements[increment].Limit) {
+			if (increment > 0) {
+				previousIncrement = encodedBidIncrements[increment - 1].Increment;
+				break;
+			}
+			else {
+				previousIncrement = encodedBidIncrements[increment].Increment;
+			}
+		}
+		//if the amount is over 100000 the previousIncrement will be 1000 (this is a corner case, if they have other increment for over 100000 this will fail)
+		if (enteredAmountFormatted >= 100000) {
+			previousIncrement = 1000;
+			break;
+		}
+
+	}
+
+
+    for (increment in encodedBidIncrements) {
+
+        //console.log("BidIncrementID,Increment,Limit", encodedBidIncrements[increment].BidIncrementId, encodedBidIncrements[increment].Increment, encodedBidIncrements[increment].Limit);
+        if (parseInt(enteredAmountFormatted) < parseInt(encodedBidIncrements[increment].Limit) || parseInt(enteredAmountFormatted) > 1) {
+
+            if (enteredAmountFormatted > 100000) {
+                var remainder = enteredAmountFormatted % 1000;
+                //console.log("remainder", remainder);
+                if (remainder != 0) {
+                   // console.log("Bidding Amount didn't match the bidding increment!", enteredAmountFormatted, 1000);
+                    var suggestedAmountLow;
+                    var suggestedAmountHigh;
+                    if (hasFormatterError) {
+                        suggestedAmountLow = enteredAmountFormatted - remainder;
+                        suggestedAmountHigh = enteredAmountFormatted + (1000 - remainder);
+                    }
+                    else {
+                        suggestedAmountLow = formatter.format(enteredAmountFormatted - remainder);
+                        suggestedAmountHigh = formatter.format(enteredAmountFormatted + (1000 - remainder));
+                    }
+                    
+                  //  console.log("suggested amount low , suggested amount high", suggestedAmountLow, suggestedAmountHigh);
+                    addNotification("#bidding-" + uniqueid, { text: 'Bid must follow bid increments, Suggested amounts are ' + suggestedAmountLow + ' or ' + suggestedAmountHigh, type: 'warning' });
+                    return false;
+                }
+                return true;
+            }
+
+           // console.log("entered Amount Formatted, current loop Limit", enteredAmountFormatted, encodedBidIncrements[increment].Limit);
+            var remainder = enteredAmountFormatted % previousIncrement
+            if (remainder != 0) {
+               // console.log("Bidding Amount didn't match the bidding increment!", enteredAmountFormatted, encodedBidIncrements[increment].Increment, encodedBidIncrements[increment].Limit);
+                var suggestedAmountLow;
+                var suggestedAmountHigh;
+                if (hasFormatterError) {
+                    suggestedAmountLow = enteredAmountFormatted - remainder;
+                    suggestedAmountHigh = enteredAmountFormatted + (previousIncrement - remainder);
+                }
+                else {
+                    suggestedAmountLow = formatter.format(enteredAmountFormatted - remainder);
+                    suggestedAmountHigh = formatter.format(enteredAmountFormatted + (previousIncrement - remainder));
+                }
+                if ((enteredAmountFormatted - remainder) < Number(maxAmount)) {
+                    if (hasFormatterError) {
+                        addNotification("#bidding-" + uniqueid, { text: 'Bid must follow bid increments. Suggested amount is ' + Number(maxAmount), type: 'warning' });
+                    }
+                    else {
+                        addNotification("#bidding-" + uniqueid, { text: 'Bid must follow bid increments. Suggested amount is ' + formatter.format(Number(maxAmount)), type: 'warning' });
+                    }
+
+                    return false;
+                }
+                else {
+                    addNotification("#bidding-" + uniqueid, { text: 'Bid must follow bid increments. Suggested amounts are ' + suggestedAmountLow + ' or ' + suggestedAmountHigh, type: 'warning' });
+                    return false;
+                }
+            }
+
+            break;
+        }
+
+        previousIncrement = encodedBidIncrements[increment].Increment;
+    }
+    return true;
+}
+
+function ValidateAmount(lotid, uniqueid)
+{
+    var txt = $("#BidAreaAmount-" + uniqueid).val();
+    //clean out non-numeric characters
+    var txt = Number(txt.replace(/[^0-9\.-]+/g, ""));
+
+    var maxAmount = $("#BidAreaAmount-" + uniqueid).data("minimumbid");
+
+    if (isNaN(parseInt(txt)))
+    {
+        addNotification("#bidding-" + uniqueid, {text: 'Please enter a valid amount.', type: 'warning'});
+        return;
+    }
+    else 
+    {
+        var difference = parseFloat(txt)-parseInt(txt);
+        if(difference > 0)
+        {
+            addNotification("#bidding-" + uniqueid, { text: 'Only whole dollar amounts are allowed for bidding.', type: 'warning' });
+            return;
+        }
+    }
+        
+    
+
+    if(maxAmount > parseFloat(txt))
+    {
+        addNotification("#bidding-" + uniqueid, { text: 'Your bid must be greater than ' + $("#BidAreaAmount-" + uniqueid).data("minimumbidformatted"), type: 'warning' });
+        return;
+    }
+
+  
+
+    var confirmAmount = $("#BidAreaAmount-" + uniqueid).data("biddingconfirmationamount");
+    var userHighBid = $("#BidAreaAmount-" + uniqueid).data("userhighbid");
+
+    if(parseFloat(txt) >= confirmAmount)
+    {
+        if(parseFloat(userHighBid) < confirmAmount)
+        {
+            var txtFormatted = $("#BidAreaAmount-" + uniqueid).formatCurrency();
+
+
+
+            addNotification("#bidding-" + uniqueid, {
+                text: 'Please confirm your bid of ' + txtFormatted.val() + ' by clicking Confirm Bid button', type: 'warning', buttons: [
+                {
+                    addClass: 'btn btn-primary', text: 'Confirm Bid', onClick: function ($noty) {
+
+                // this = button element
+                // $noty = $noty element
+
+                $noty.close();
+                ShowConfirmationButton(uniqueid);
+            }
+
+            },
+                {
+                    addClass: 'btn btn-danger', text: 'Cancel', onClick: function ($noty) {
+                $noty.close();
+                }
+            }
+            ]
+            });
+            //$("#bidding-" + uniqueid).noty({text: 'Please confirm your bid of  $' + txt + ' by clicking Confirm Bid button', type: 'warning',  buttons: [
+            //{addClass: 'btn btn-primary', text: 'Confirm Bid', onClick: function($noty) {
+
+            //    // this = button element
+            //    // $noty = $noty element
+
+            //    $noty.close();
+            //    ShowConfirmationButton(uniqueid);
+            //}
+
+            //},
+            //{addClass: 'btn btn-danger', text: 'Cancel', onClick: function($noty) {
+            //    $noty.close();
+            //    }
+            //}
+            //]
+            //});
+            return;
+        }
+    }
+    ShowConfirmationButton(uniqueid);
+
+
+
+}
+function ShowConfirmationButton(uniqueid)
+{
+    $('#BidAreaButtons-' + uniqueid).slideUp();
+    $('#BidAreaConfirm-' + uniqueid).slideDown();
+}
+
+function BidProcessAjax(lotid, userid, uniqueid)
+{
+    $('#BidAreaConfirm-' + uniqueid).hide();
+    var bidamount = $("#BidAreaAmount-" + uniqueid).val();
+
+    //clean out non-numeric characters
+    var bidamount = Number(bidamount.replace(/[^0-9\.-]+/g, ""));
+
+    var bidData = {Amount: bidamount, LotId: lotid, UniqueId: uniqueid}
+    $.ajax({
+        url: "/Auction/PlaceBid/",
+        data: bidData,
+        datatype: "json",
+        success: function(data)
+        {
+            var msg = JSON.parse(data);
+                
+            if (msg.Message == "Congratulations, you have placed a bid!" || msg.Message == "You have been outbid by another user's maximum bid."){
+                WatchLotAjax(lotid, userid, 'WatchLotButton-' + (uniqueid.indexOf('single') > -1 ? uniqueid : lotid), "True");
+
+                // AdShark Successful bid tracking
+                dataLayer.push({
+                    'event': 'successfulBid',
+                    'bidsuccessamount': bidamount,
+                    'auctionitemid': lotid
+                });
+            }
+                
+            notification = $("#bidding-" + msg.UniqueId).noty({
+                text: msg.Message, type: msg.notyClass, callback: {
+                    onClose: function () {
+                        var wnd = $("#BiddingFrame").data("kendoWindow");
+                        wnd.close();
+                        //$("#BiddingForm-" + uniqueid).load('/Auction/AuctionBiddingIframe?id=' + lotid + '&UniqueId=' + uniqueid);
+                        //var frame = $("#more-info-" + uniqueid).hide();
+                    }
+                }
+            });
+            notification.setTimeout(4000);
+
+            return false;
+        },
+        error: function()
+        {
+
+        }
+
+    });
+
+    return false;
+}
+
+function showPicture(imagepath, clickedId, pictureGalleryId, PhototableId) {
+    var ul = document.getElementById(pictureGalleryId);
+    var items = ul.getElementsByTagName("li");
+    for (var i = 0; i < items.length; ++i) {
+        if (items[i].id == "p+" + imagepath) {
+            items[i].style.display = 'block';
+        }
+        else {
+            items[i].style.display = 'none';
+        }
+    }
+
+    var table = document.getElementById(PhototableId);
+    var tableItems = table.getElementsByTagName("td");
+    for (var i = 0; i < tableItems.length; ++i) {
+        if (tableItems[i].id == clickedId) {
+            tableItems[i].className = "SelectedPhoto";
+        }
+        else {
+            tableItems[i].className = "";
+        }
+    }
+}
+function goBack() {
+    window.location = document.referrer;
+}
+
+function descClick(AuctionId, isMobile) {
+    $("#desc").removeClass("inactive");
+    $("#desc").addClass("current");
+    $("#lotsList").removeClass("current");
+    $("#lotsList").addClass("inactive");
+    $("#closedlots").removeClass("current");
+    $("#closedlots").addClass("inactive");
+    $("#lotCat").removeClass("current");
+    $("#lotCat").addClass("inactive");
+    $("#terms").removeClass("current");
+    $("#terms").addClass("inactive");
+    $("#mapview").removeClass("current");
+    $("#mapview").addClass("inactive");
+    $("#descriptionTab").show();
+    $("#lotListingsTab").hide();
+    $("#lotCategoryTab").hide();
+    $("#closedlotsTab").hide();
+    $("#termsTab").hide();
+    $("#mapTab").hide();
+    $.cookie("'" + AuctionId + "'", 'descClick');
+    var map = $("#descriptionTab iframe");
+    if (map.length > 0) {
+        for (var i = 0; i < map.length; i++) {
+            map[i].src += '';
+        }
+    }
+    if (isMobile)
+    {
+        $('#desc').css("background-color", $(".auctionTypeButtons div").css("background-color"));
+        $('#terms').css("background-color", '#d2d2d3');
+        $('#lotsList').css("background-color", '#d2d2d3');
+        $('#descriptionTab #inner-content').css("border-top-color", $(".auctionTypeButtons div").css("background-color"));
+    }
+}
+
+function closedlotsClick(AuctionId) {
+    $("#desc").removeClass("current");
+    $("#desc").addClass("inactive");
+    $("#lotsList").removeClass("current");
+    $("#lotsList").addClass("inactive");
+    $("#closedlots").removeClass("inactive");
+    $("#closedlots").addClass("current");
+    $("#lotCat").removeClass("current");
+    $("#lotCat").addClass("inactive");
+    $("#terms").removeClass("current");
+    $("#terms").addClass("inactive");
+    $("#mapview").removeClass("current");
+    $("#mapview").addClass("inactive");
+    $("#descriptionTab").hide();
+    $("#lotListingsTab").hide();
+    $("#lotCategoryTab").hide();
+    $("#closedlotsTab").show();
+    $("#termsTab").hide();
+    $("#mapTab").hide();
+    // $.cookie("'" + AuctionId + "'", 'descClick');
+    //jquery load here
+    $('#closedlotsTab').addClass("loadingimg");
+    $('#closedlotsTab').css({ 'height': 600 });
+    $("#closedlotsTab").load("/Auction/ClosedLotsLoad?AuctionId=" + AuctionId, function () {
+        $('#closedlotsTab').removeClass("loadingimg");
+        $('#closedlotsTab').css('height', 'auto');
+    });
+}
+
+function lotsListClick(AuctionId, isMobile) {
+    $("#lotsList").removeClass("inactive");
+    $("#lotsList").addClass("current");
+    $("#closedlots").removeClass("current");
+    $("#closedlots").addClass("inactive");
+    $("#desc").removeClass("current");
+    $("#desc").addClass("inactive");
+    $("#lotCat").removeClass("current");
+    $("#lotCat").addClass("inactive");
+    $("#terms").removeClass("current");
+    $("#terms").addClass("inactive");
+    $("#mapview").removeClass("current");
+    $("#mapview").addClass("inactive");
+    $("#lotListingsTab").show();
+    $("#descriptionTab").hide();
+    $("#lotCategoryTab").hide();
+    $("#closedlotsTab").hide();
+    $("#termsTab").hide();
+    $("#mapTab").hide();
+    $.cookie("'" + AuctionId + "'", 'lotsListClick');
+    if (isMobile)
+    {
+        $('#lotsList').css("background-color", $(".auctionTypeButtons div").css("background-color"));
+        $('#desc').css("background-color", '#d2d2d3');
+        $('#terms').css("background-color", '#d2d2d3');
+    }
+}
+
+function lotCatClick(AuctionId) {
+    $("#lotCat").removeClass("inactive");
+    $("#lotCat").addClass("current");
+    $("#closedlots").removeClass("current");
+    $("#closedlots").addClass("inactive");
+    $("#lotsList").removeClass("current");
+    $("#lotsList").addClass("inactive");
+    $("#desc").removeClass("current");
+    $("#desc").addClass("inactive");
+    $("#terms").removeClass("current");
+    $("#terms").addClass("inactive");
+    $("#mapview").removeClass("current");
+    $("#closedlotsTab").hide();
+    $("#mapview").addClass("inactive");
+    if(categoryClick == null)
+    {
+        categoryClick = false;
+    }
+    if(categoryClick == false)
+    {
+        $('#lotCategoryTab').addClass("loadingimg");
+        $('#lotCategoryTab').css('height', 600);
+        $("#lotCategoryTab").load("/Auction/LoadAuctionCategoryView?AuctionId=" + AuctionId,function () {
+            $('#lotCategoryTab').removeClass("loadingimg");
+            $('#lotCategoryTab').css('height', 'auto');
+        });
+        categoryClick = true;
+    }
+    $("#lotCategoryTab").show();
+    $("#lotListingsTab").hide();
+    $("#descriptionTab").hide();
+    $("#termsTab").hide();
+    $("#mapTab").hide();
+    $.cookie("'" + AuctionId + "'", 'lotCatClick');
+}
+
+function termsClick(AuctionId, isMobile) {
+    $("#terms").removeClass("inactive");
+    $("#terms").addClass("current");
+    $("#lotsList").removeClass("current");
+    $("#lotsList").addClass("inactive");
+    $("#closedlots").removeClass("current");
+    $("#closedlots").addClass("inactive");
+    $("#lotCat").removeClass("current");
+    $("#lotCat").addClass("inactive");
+    $("#desc").removeClass("current");
+    $("#desc").addClass("inactive");
+    $("#mapview").removeClass("current");
+    $("#mapview").addClass("inactive");
+    $('#termsTab').addClass("loadingimg");
+    $('#termsTab').css({ 'height': 600 });
+    $('#termsTab #inner-content #terms').remove();
+    $('#termsTab #inner-content').prepend($("<div id='terms'>").load("/Auction/LoadTermsAndConditions?AuctionId=" + AuctionId, function () {
+        $('#termsTab').removeClass("loadingimg");
+        $('#termsTab').css('height', 'auto');
+    }));
+    $("#termsTab").show();
+    $("#lotListingsTab").hide();
+    $("#closedlotsTab").hide();
+    $("#lotCategoryTab").hide();
+    $("#descriptionTab").hide();
+    $("#mapTab").hide();
+    $.cookie("'" + AuctionId + "'", 'termsClick');
+
+    if (isMobile)
+    {
+        $('#terms').css("background-color", $(".auctionTypeButtons div").css("background-color"));
+        $('#desc').css("background-color", '#d2d2d3');
+        $('#lotsList').css("background-color", '#d2d2d3');
+        $('#termsTab #inner-content').css("border-top-color", $(".auctionTypeButtons div").css("background-color"));
+    }
+}
+
+function mapClick(AuctionId) {
+    $("#mapview").removeClass("inactive");
+    $("#AuctionMapIframe").prop('src', '/Auction/SingleAuctionMapView?AuctionId=' + AuctionId);
+    $("#mapview").addClass("current");
+    $("#lotsList").removeClass("current");
+    $("#lotsList").addClass("inactive");
+    $("#closedlots").removeClass("current");
+    $("#closedlots").addClass("inactive");
+    $("#lotCat").removeClass("current");
+    $("#lotCat").addClass("inactive");
+    $("#desc").removeClass("current");
+    $("#desc").addClass("inactive");
+    $("#terms").removeClass("current");
+    $("#terms").addClass("inactive");
+    $("#mapTab").show();
+    $("#lotListingsTab").hide();
+    $("#closedlotsTab").hide();
+    $("#lotCategoryTab").hide();
+    $("#descriptionTab").hide();
+    $("#termsTab").hide();
+    $.cookie("'" + AuctionId + "'", 'mapClick');
+    //resizeMap();
+}
