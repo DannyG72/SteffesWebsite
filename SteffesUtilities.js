@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
 // @namespace    https://github.com/DannyG72
-// @version      2.8
+// @version      2.9
 // @description  Adds a few quick-link buttons to the Steffes Group website for quick assistance and admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
@@ -181,7 +181,11 @@
      auctionSearchString = auctionSearchString.replace('%20',' ')
      console.log(auctionSearchString)
      if (auctionSearchString.length>0) {filterAuctions(auctionSearchString)}
-    }
+    } else {if (currentPageUrl.includes('&Filter=')) {
+     auctionSearchString = currentPageUrl.split('&Filter=')[1]
+     auctionSearchString = auctionSearchString.replace('%20',' ')
+     console.log(auctionSearchString)
+     if (auctionSearchString.length>0) {filterAuctions(auctionSearchString)}}}
 
      //Creates a search bar for searching auctions.
      let auctionSearch = document.createElement("INPUT");
@@ -192,8 +196,13 @@
      if (currentPageUrl.includes('?Filter=')) {
       auctionSearchString = currentPageUrl.split('?Filter=')[1]
       auctionSearchString = auctionSearchString.replace('%20',' ')
-
      auctionSearch.defaultValue = auctionSearchString}
+
+     if (currentPageUrl.includes('&Filter=')) {
+      auctionSearchString = currentPageUrl.split('&Filter=')[1]
+      auctionSearchString = auctionSearchString.replace('%20',' ')
+     auctionSearch.defaultValue = auctionSearchString}
+
 
 
      auctionSearch.setAttribute("type", "text");
@@ -208,7 +217,7 @@
      auctionSearchCurrentGo.addEventListener("click", function() {
       let auctionString = document.getElementById("auctionSearch").value;
       auctionString = auctionString.replace(/ /g,'%20');
-      if ((currentPageUrl.includes('?Filter=')) && ((currentPageUrl.endsWith('?Filter='))==false)) {
+      if (((currentPageUrl.includes('?Filter=')) && ((currentPageUrl.endsWith('?Filter='))==false)) || ((currentPageUrl.includes('ArchivedAuctions')) == false)) {
        auctionSearchString = currentPageUrl.split('?Filter=')[1]
        auctionSearchString = auctionSearchString.replace('%20',' ')
       window.location.href = 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString;}
@@ -246,6 +255,20 @@
      auctionSearchArchivedGo.innerHTML = "Archived";
      auctionSearchArchivedGo.className= 'custom-button-for-stuff'
      auctionSearchArchivedGo.style.width= '84px';
+     auctionSearchArchivedGo.addEventListener("click", function() {
+      let auctionString = document.getElementById("auctionSearch").value;
+      auctionString = auctionString.replace(/ /g,'%20');
+      if ((currentPageUrl.includes('&Filter=')) && ((currentPageUrl.endsWith('&Filter='))==false)) {
+       auctionSearchString = currentPageUrl.split('&Filter=')[1]
+       auctionSearchString = auctionSearchString.replace('%20',' ')
+      window.location.href = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=250&Page=1&Filter='+auctionString;}
+      else {
+       if (auctionString.length>0) {
+        filterAuctions(auctionString)
+        history.pushState({}, null, 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=250&Page=1&Filter='+auctionString);
+        currentPageUrl = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=250&Page=1&Filter='+auctionString
+       }
+      }})
 
 
      rightSide.appendChild(auctionSearch)
