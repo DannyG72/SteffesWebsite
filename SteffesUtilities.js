@@ -10,6 +10,23 @@
 // @grant       GM_addStyle
 // ==/UserScript==
 (function() {
+    // var auctions = document.getElementsByClassName("auction-left")
+    // let modifiedAuctions = []
+    //  for (let i = 0; i < auctions.length; i++) {
+    //  let auction = auctions[i]
+    //  let parentDIV = auction.parentElement.parentElement.parentElement.parentElement.parentElement
+    //  parentDIV.setAttribute("id", "auction--"+i.toString()+'--');
+    //  let auctionHTML = auction.outerHTML.toLowerCase()
+    //  let searchText = 'Mahnomen'.toLowerCase()
+    //  if (auctionHTML.includes(searchText)) {
+    //  } else {
+    //   modifiedAuctions.push(parentDIV.id)
+    //  }}
+    //  modifiedAuctions.forEach(function(auctionID) {
+    //    var element = document.getElementById(auctionID);
+    //    element.parentNode.removeChild(element);
+    //  })
+
 
     let style = document.createElement('style');
     style.type='text/css';
@@ -158,7 +175,86 @@
     leftSide.appendChild(steffesLogo);
 
 
-    if (currentPageUrl.startsWith('https://steffesapi.nextlot.com/login/login')) {
+    if ((currentPageUrl.startsWith('https://steffesgroup.com/Home/Auctions')) || (currentPageUrl.startsWith('https://steffesgroup.com/Auction/AllAuctions')) || (currentPageUrl.startsWith('https://steffesgroup.com/Auction/ArchivedAuctions'))){
+    if (currentPageUrl.includes('?Filter=')) {
+     auctionSearchString = currentPageUrl.split('?Filter=')[1]
+     auctionSearchString = auctionSearchString.replace('%20',' ')
+     console.log(auctionSearchString)
+     if (auctionSearchString.length>0) {filterAuctions(auctionSearchString)}
+    }
+
+     //Creates a search bar for searching auctions.
+     let auctionSearch = document.createElement("INPUT");
+
+     auctionSearch.id="auctionSearch";
+     auctionSearch.className='custom-search-input';
+
+     if (currentPageUrl.includes('?Filter=')) {
+      auctionSearchString = currentPageUrl.split('?Filter=')[1]
+      auctionSearchString = auctionSearchString.replace('%20',' ')
+
+     auctionSearch.defaultValue = auctionSearchString}
+
+
+     auctionSearch.setAttribute("type", "text");
+     auctionSearch.placeholder="Search Auctions...";
+
+     //Creates a go button for activating the auction search bar.
+     let auctionSearchCurrentGo = document.createElement("Button");
+     auctionSearchCurrentGo.id="auctionSearchCurrentGo";
+     auctionSearchCurrentGo.innerHTML = "Current";
+     auctionSearchCurrentGo.className= 'custom-button-for-stuff'
+     auctionSearchCurrentGo.style.width= '77px';
+     auctionSearchCurrentGo.addEventListener("click", function() {
+      let auctionString = document.getElementById("auctionSearch").value;
+      auctionString = auctionString.replace(/ /g,'%20');
+      if ((currentPageUrl.includes('?Filter=')) && ((currentPageUrl.endsWith('?Filter='))==false)) {
+       auctionSearchString = currentPageUrl.split('?Filter=')[1]
+       auctionSearchString = auctionSearchString.replace('%20',' ')
+      window.location.href = 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString;}
+      else {
+       if (auctionString.length>0) {
+        filterAuctions(auctionString)
+        history.pushState({}, null, 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString);
+        currentPageUrl = 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString
+       }
+      }})
+
+
+
+     auctionSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
+       event.preventDefault();
+       let auctionString = document.getElementById("auctionSearch").value;
+       auctionString = auctionString.replace(/ /g,'%20');
+       if ((currentPageUrl.includes('?Filter=')) && ((currentPageUrl.endsWith('?Filter='))==false)) {
+        auctionSearchString = currentPageUrl.split('?Filter=')[1]
+        auctionSearchString = auctionSearchString.replace('%20',' ')
+        console.log(auctionSearchString)
+       window.location.href = 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString;}
+       else {
+        if (auctionString.length>0) {
+         filterAuctions(auctionString)
+         history.pushState({}, null, 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString);
+         currentPageUrl = 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString
+        }}
+       ;}});
+
+
+     //Creates a go button for activating the search bar.
+     let auctionSearchArchivedGo = document.createElement("Button");
+     auctionSearchArchivedGo.id="auctionSearchArchivedGo";
+     auctionSearchArchivedGo.innerHTML = "Archived";
+     auctionSearchArchivedGo.className= 'custom-button-for-stuff'
+     auctionSearchArchivedGo.style.width= '84px';
+
+
+     rightSide.appendChild(auctionSearch)
+     rightSide.appendChild(auctionSearchCurrentGo)
+     rightSide.appendChild(auctionSearchArchivedGo)
+    }
+
+
+    if (currentPageUrl.startsWith('https://steffesapi.nextlot.com/login/login')){
       //let nextLotLoginButton = document.getElementsByClassName("btn btn-primary")[0]
       //rightSide.appendChild(nextLotLoginButton)
       let countdown = document.createElement('div');
@@ -361,6 +457,29 @@ function toTitleCase(str) {
     );
 }
 
-function sleep (time) {
-  return new Promise((resolve) => setTimeout(resolve, time));
+function sleep(delay) {
+    var start = new Date().getTime();
+    while (new Date().getTime() < start + delay);
+}
+
+function filterAuctions(searchString) {
+
+ var auctions = document.getElementsByClassName("auction-left")
+ let modifiedAuctions = []
+  for (let i = 0; i < auctions.length; i++) {
+  let auction = auctions[i]
+  let parentDIV = auction.parentElement.parentElement.parentElement.parentElement.parentElement
+  parentDIV.setAttribute("id", "auction--"+i.toString()+'--');
+  let auctionHTML = auction.outerHTML.toLowerCase()
+  let searchText = searchString.toLowerCase()
+  if (auctionHTML.includes(searchText)) {
+  } else {
+   modifiedAuctions.push(parentDIV.id)
+  }}
+  modifiedAuctions.forEach(function(auctionID) {
+    var element = document.getElementById(auctionID);
+    element.parentNode.removeChild(element);
+  })
+
+
 }
