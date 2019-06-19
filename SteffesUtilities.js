@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
 // @namespace    https://github.com/DannyG72
-// @version      2.9
+// @version      3.0
 // @description  Adds a few quick-link buttons to the Steffes Group website for quick assistance and admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
@@ -288,10 +288,8 @@
         auctionSearchString = auctionSearchString.replace('%20',' ')
        window.location.href = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=250&Page=1&Filter='+auctionString;}
        else {
-        if (auctionString.length>-1) {
-         window.location.href = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=250&Page=1&Filter='+auctionString
+        window.location.href = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=250&Page=1&Filter='+auctionString
          currentPageUrl = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=250&Page=1&Filter='+auctionString
-        }
        }})
 
 
