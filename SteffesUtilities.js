@@ -241,30 +241,37 @@
       auctionSearchCurrentGo.addEventListener("click", function() {
        let auctionString = document.getElementById("auctionSearch").value;
        auctionString = auctionString.replace(/ /g,'%20');
-       if (((currentPageUrl.includes('?Filter=')) && ((currentPageUrl.endsWith('?Filter='))==false)) || ((currentPageUrl.includes('ArchivedAuctions')) == false)) {
-        auctionSearchString = currentPageUrl.split('?Filter=')[1]
-        auctionSearchString = auctionSearchString.replace('%20',' ')
+       console.log(currentPageUrl)
+       if (((currentPageUrl.includes('?Filter=')) && ((currentPageUrl.endsWith('?Filter='))==false)) || (((currentPageUrl.includes('ArchivedAuctions')) == false) && ((currentPageUrl.endsWith('Filter='))==false) && (((currentPageUrl.endsWith('Auctions')) == false)))) {
+        // auctionSearchString = currentPageUrl.split('?Filter=')[1]
+        // auctionSearchString = auctionSearchString.replace('%20',' ')
+        console.log('stahp')
        window.location.href = 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString;}
        else {
-        if ((auctionString.length>0) && (currentPageUrl.startsWith('https://steffesgroup.com/Auction/AllAuctions'))) {
+        if ((auctionString.length>0) && (currentPageUrl.endsWith('Auctions'))) {
          filterAuctions(auctionString)
          history.pushState({}, null, 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString);
          currentPageUrl = 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString
         } else { window.location.href = 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString;
 
         }
-       }})
+       }
+
+
+       })
 
       auctionSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
         event.preventDefault();
         let auctionString = document.getElementById("auctionSearch").value;
         auctionString = auctionString.replace(/ /g,'%20');
-        if (((currentPageUrl.includes('?Filter=')) && ((currentPageUrl.endsWith('?Filter='))==false)) || ((currentPageUrl.includes('ArchivedAuctions')) == false)) {
-         auctionSearchString = currentPageUrl.split('?Filter=')[1]
-         auctionSearchString = auctionSearchString.replace('%20',' ')
+        console.log(currentPageUrl)
+        if (((currentPageUrl.includes('?Filter=')) && ((currentPageUrl.endsWith('?Filter='))==false)) || (((currentPageUrl.includes('ArchivedAuctions')) == false) && ((currentPageUrl.endsWith('Filter='))==false) && (((currentPageUrl.endsWith('Auctions')) == false)))) {
+         // auctionSearchString = currentPageUrl.split('?Filter=')[1]
+         // auctionSearchString = auctionSearchString.replace('%20',' ')
+         console.log('stahp')
         window.location.href = 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString;}
         else {
-         if ((auctionString.length>0) && (currentPageUrl.startsWith('https://steffesgroup.com/Auction/AllAuctions'))) {
+         if ((auctionString.length>0) && (currentPageUrl.endsWith('Auctions'))) {
           filterAuctions(auctionString)
           history.pushState({}, null, 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString);
           currentPageUrl = 'https://steffesgroup.com/Auction/AllAuctions?Filter='+auctionString
@@ -286,10 +293,10 @@
        if ((currentPageUrl.includes('&Filter=')) && ((currentPageUrl.endsWith('&Filter='))==false)) {
         auctionSearchString = currentPageUrl.split('&Filter=')[1]
         auctionSearchString = auctionSearchString.replace('%20',' ')
-       window.location.href = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=250&Page=1&Filter='+auctionString;}
+       window.location.href = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=5000&Page=1&Filter='+auctionString;}
        else {
-        window.location.href = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=250&Page=1&Filter='+auctionString
-         currentPageUrl = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=250&Page=1&Filter='+auctionString
+        window.location.href = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=5000&Page=1&Filter='+auctionString
+         currentPageUrl = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=5000&Page=1&Filter='+auctionString
        }})
 
 
