@@ -366,9 +366,8 @@
               let bidderString = document.getElementById("bidderSearch").value;
               bidderString = bidderString.replace(/ /g,'%20');
               openInNewTab('https://steffesapi.nextlot.com/login/login')
-              sleep(0).then(() => {
-                openInNewTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
-                });
+              sleep(2000)
+              openInNewTab('https://steffesapi.nextlot.com/admin/new#/users?q='+bidderString);
               })}
       else {
         bidderSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
