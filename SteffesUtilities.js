@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
 // @namespace    https://github.com/DannyG72
-// @version      3.1
+// @version      3.2
 // @description  Adds a few quick-link buttons to the Steffes Group website for quick assistance and admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
@@ -130,7 +130,7 @@
     //Gets the current page url and strips the auction ID from it
     let currentPageUrl = window.location.href;
     let AuctionID = ((currentPageUrl.split("").reverse().join("").split("-"))[0]).split("").reverse().join("");
-
+    let nextLotBidderButton = document.createElement("Button");
     let grandParent = document.createElement('div');
     grandParent.className= 'custom-div-grandParent';
     document.body.appendChild(grandParent);
@@ -168,7 +168,7 @@
       parent.appendChild(countdown)
       var timeleft = 25;
       var downloadTimer = setInterval(function(){
-        document.getElementById("countdown").innerHTML = "If you are already signed into NextLot, ignore this webpage. It will automatically close in "+ timeleft + " seconds. If the NextLot search tab isn't working, please sign in below.";
+        document.getElementById("countdown").innerHTML = "If you are already signed into NextLot, ignore this webpage. It will automatically close in "+ timeleft + " seconds. Please sign in below if NextLot pages are not working.";
         timeleft -= 1;
         if(timeleft < 0){
           clearInterval(downloadTimer);
@@ -351,7 +351,7 @@
           ;}});
 
 
-          let nextLotBidderButton = document.createElement("Button");
+          console.log('creating nextlotBidderbutton')
           nextLotBidderButton.id="nextLotBidderButton";
           nextLotBidderButton.className= 'custom-button-for-stuff'
           nextLotBidderButton.innerHTML = "Search NextLot";
@@ -363,6 +363,7 @@
           }
           catch(err) {}
           nextLotBidderButton.style.width= '140px'
+          console.log(1)
           nextLotBidderButton.addEventListener("click", function() {
               let bidderString = document.getElementById("bidderSearch").value;
               bidderString = bidderString.replace(/ /g,'%20');
@@ -397,9 +398,7 @@
 
       leftSide.appendChild(bidderSearch);
       leftSide.appendChild(bidderButton);
-      try {leftSide.appendChild(nextLotBidderButton);}
-      catch(err){}
-
+      if (currentPageUrl.includes('https://steffesgroup.com/Admin/SearchBidders?SearchText=')) {leftSide.appendChild(nextLotBidderButton)}
 
       //Checks to see if the current page is an auction page, if so, append auction specific buttons.
       if (currentPageUrl.startsWith('https://steffesgroup.com/Auction/AuctionDetails?Name=')) {
@@ -421,7 +420,10 @@
 
         try{let tmpListNextLotBackendId = (html.split('data-sale-id="'))[1]
         let nextLotBackendId = (tmpListNextLotBackendId.split('"'))[0]
-        absenteeBids.addEventListener("click", function() {openInNewTab('https://steffesapi.nextlot.com/admin_lot?association=lots&parent_scaffold=admin_sale&sale_id='+nextLotBackendId+'&adapter=_list_inline_adapter');});
+        absenteeBids.addEventListener("click", function() {
+         //openInNewTab('https://steffesapi.nextlot.com/login/login')
+         sleep(2000)
+         openInNewTab('https://steffesapi.nextlot.com/admin_lot?association=lots&parent_scaffold=admin_sale&sale_id='+nextLotBackendId+'&adapter=_list_inline_adapter');});
         }catch(err){}
         //}
         //catch(err){
