@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
 // @namespace    https://github.com/DannyG72
-// @version      3.0
+// @version      3.1
 // @description  Adds a few quick-link buttons to the Steffes Group website for quick assistance and admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
@@ -201,12 +201,12 @@
 
      if ((currentPageUrl.startsWith('https://steffesgroup.com/Home/Auctions')) || (currentPageUrl.startsWith('https://steffesgroup.com/Auction/AllAuctions')) || (currentPageUrl.startsWith('https://steffesgroup.com/Auction/ArchivedAuctions'))){
      if (currentPageUrl.includes('?Filter=')) {
-      auctionSearchString = currentPageUrl.split('?Filter=')[1]
+      let auctionSearchString = currentPageUrl.split('?Filter=')[1]
       auctionSearchString = auctionSearchString.replace('%20',' ')
       console.log(auctionSearchString)
       if (auctionSearchString.length>0) {filterAuctions(auctionSearchString)}
      } else {if (currentPageUrl.includes('&Filter=')) {
-      auctionSearchString = currentPageUrl.split('&Filter=')[1]
+      let auctionSearchString = currentPageUrl.split('&Filter=')[1]
       auctionSearchString = auctionSearchString.replace('%20',' ')
       console.log(auctionSearchString)
       if (auctionSearchString.length>0) {filterAuctions(auctionSearchString)}}}
@@ -218,12 +218,12 @@
       auctionSearch.className='custom-search-input';
 
       if (currentPageUrl.includes('?Filter=')) {
-       auctionSearchString = currentPageUrl.split('?Filter=')[1]
+       let auctionSearchString = currentPageUrl.split('?Filter=')[1]
        auctionSearchString = auctionSearchString.replace('%20',' ')
       auctionSearch.defaultValue = auctionSearchString}
 
       if (currentPageUrl.includes('&Filter=')) {
-       auctionSearchString = currentPageUrl.split('&Filter=')[1]
+       let auctionSearchString = currentPageUrl.split('&Filter=')[1]
        auctionSearchString = auctionSearchString.replace('%20',' ')
       auctionSearch.defaultValue = auctionSearchString}
 
@@ -231,6 +231,7 @@
 
       auctionSearch.setAttribute("type", "text");
       auctionSearch.placeholder="Search Auctions...";
+      auctionSearch.style.width='155px';
 
       //Creates a go button for activating the auction search bar.
       let auctionSearchCurrentGo = document.createElement("Button");
@@ -291,7 +292,7 @@
        let auctionString = document.getElementById("auctionSearch").value;
        auctionString = auctionString.replace(/ /g,'%20');
        if ((currentPageUrl.includes('&Filter=')) && ((currentPageUrl.endsWith('&Filter='))==false)) {
-        auctionSearchString = currentPageUrl.split('&Filter=')[1]
+        let auctionSearchString = currentPageUrl.split('&Filter=')[1]
         auctionSearchString = auctionSearchString.replace('%20',' ')
        window.location.href = 'https://steffesgroup.com/Auction/ArchivedAuctions?&Sort=Name&PageSize=200&Page=1&Filter='+auctionString;}
        else {
@@ -350,7 +351,7 @@
           ;}});
 
 
-          nextLotBidderButton = document.createElement("Button");
+          let nextLotBidderButton = document.createElement("Button");
           nextLotBidderButton.id="nextLotBidderButton";
           nextLotBidderButton.className= 'custom-button-for-stuff'
           nextLotBidderButton.innerHTML = "Search NextLot";
@@ -409,6 +410,28 @@
         backendButton.className= 'custom-button-for-stuff custom-admin-button'
         backendButton.addEventListener("click", function() {openInNewTab('https://steffesgroup.com/Admin/AuctionDetails?auctionId=' +AuctionID);});
 
+        let html = content.innerHTML;
+        //try {
+        let absenteeBids = document.createElement("Button");
+        absenteeBids.innerHTML = "NextLot Page";
+        absenteeBids.id="absenteeBids";
+        absenteeBids.className= 'custom-button-for-stuff custom-admin-button'
+        absenteeBids.style.width='130px'
+        absenteeBids.style.minWidth='130px'
+
+        try{let tmpListNextLotBackendId = (html.split('data-sale-id="'))[1]
+        let nextLotBackendId = (tmpListNextLotBackendId.split('"'))[0]
+        absenteeBids.addEventListener("click", function() {openInNewTab('https://steffesapi.nextlot.com/admin_lot?association=lots&parent_scaffold=admin_sale&sale_id='+nextLotBackendId+'&adapter=_list_inline_adapter');});
+        }catch(err){}
+        //}
+        //catch(err){
+        //}
+
+
+
+
+
+
         try {let nextLotBackendButton = document.createElement("Button");
         nextLotBackendButton.innerHTML = "NextLot Page";
         nextLotBackendButton.id="nextLotBackendButton";
@@ -433,6 +456,9 @@
           let foundLotID = currentAuc.split('" style="')[0];
           let backendLotLink = 'https://steffesgroup.com/Admin/LotDetails?lotId='+foundLotID;
           openInNewTab(backendLotLink);});
+          if (html.includes('<img src="https://cdn.steffesgroup.com/static-files/images/interior/viewWebcastButton.png" alt="View webcast button">')) {
+           rightSide.appendChild(absenteeBids)
+          }
           rightSide.appendChild(backendButton);
           try{rightSide.appendChild(nextLotBackendButton);}catch(err){}
         //Takes the lotIDS letiable from the SteffesGroup website and splits it into a array to be used for the options in the selection list
