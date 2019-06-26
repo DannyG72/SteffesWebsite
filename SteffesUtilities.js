@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
 // @namespace    https://github.com/DannyG72
-// @version      3.2
+// @version      3.4
 // @description  Adds a few quick-link buttons to the Steffes Group website for quick assistance and admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
@@ -422,7 +422,6 @@
         let nextLotBackendId = (tmpListNextLotBackendId.split('"'))[0]
         absenteeBids.addEventListener("click", function() {
          //openInNewTab('https://steffesapi.nextlot.com/login/login')
-         sleep(2000)
          openInNewTab('https://steffesapi.nextlot.com/admin_lot?association=lots&parent_scaffold=admin_sale&sale_id='+nextLotBackendId+'&adapter=_list_inline_adapter');});
         }catch(err){}
         //}
@@ -458,7 +457,7 @@
           let foundLotID = currentAuc.split('" style="')[0];
           let backendLotLink = 'https://steffesgroup.com/Admin/LotDetails?lotId='+foundLotID;
           openInNewTab(backendLotLink);});
-          if (html.includes('<img src="https://cdn.steffesgroup.com/static-files/images/interior/viewWebcastButton.png" alt="View webcast button">')) {
+          if ((html.includes('<img src="https://cdn.steffesgroup.com/static-files/images/interior/viewWebcastButton.png" alt="View webcast button">')) || (html.includes('<img src="https://cdn.steffesgroup.com/static-files/images/interior/webcast-available-icon.png" alt="View webcast button">'))) {
            rightSide.appendChild(absenteeBids)
           }
           rightSide.appendChild(backendButton);
