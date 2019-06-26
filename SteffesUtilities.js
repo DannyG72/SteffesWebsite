@@ -6,8 +6,10 @@
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
 // @match        https://steffesapi.nextlot.com/login/login
-// @homepage     https://github.com/DannyG72/SteffesWebsite/blob/master/SteffesUtilities.js
-// @grant       GM_addStyle
+// @homepage     https://raw.githubusercontent.com/DannyG72/SteffesWebsite/master/SteffesUtilities.js
+// @downloadURL  https://raw.githubusercontent.com/DannyG72/SteffesWebsite/master/SteffesUtilities.js
+// @updateURL    https://raw.githubusercontent.com/DannyG72/SteffesWebsite/master/SteffesUtilities.js
+// @grant        GM_addStyle
 // ==/UserScript==
 (function() {
     let style = document.createElement('style');
