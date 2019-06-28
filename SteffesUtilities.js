@@ -452,13 +452,21 @@
         lotBackendGo.className= 'custom-button-for-stuff'
         lotBackendGo.addEventListener("click", function() {
           let selected = selectList.selectedOptions[0].value;
+          console.log(selected)
+          if (selected == 'View All') {
+          if (currentPageUrl.includes('&')) {
+              let lotViewAllUrl = currentPageUrl.split('&')
+              window.location.href = lotViewAllUrl[0]+'&PageSize=500'
+          } else {window.location.href = currentPageUrl+'&PageSize=500'}
+          }
+            else {
           let html = content.outerHTML;
           let splitHTML = (html.split(selected))[0];
           let splitLots = splitHTML.split('datatablestart-lot-');
           let currentAuc = splitLots.pop();
           let foundLotID = currentAuc.split('" style="')[0];
           let backendLotLink = 'https://steffesgroup.com/Admin/LotDetails?lotId='+foundLotID;
-          openInNewTab(backendLotLink);});
+          openInNewTab(backendLotLink);}});
           if ((html.includes('<img src="https://cdn.steffesgroup.com/static-files/images/interior/viewWebcastButton.png" alt="View webcast button">')) || (html.includes('<img src="https://cdn.steffesgroup.com/static-files/images/interior/webcast-available-icon.png" alt="View webcast button">'))) {
            rightSide.appendChild(absenteeBids)
           }
@@ -476,8 +484,12 @@
         if (arrayOpts.length > 0) rightSide.appendChild(selectList);
 
         //Create and append the options to the select list.
-        try
-        {for (let i = 0; i < arrayOpts.length; i++) {
+        try {
+          let option = document.createElement("option");
+          option.value = 'View All';
+          option.text = 'View All';
+          selectList.appendChild(option)
+         for (let i = 0; i < arrayOpts.length; i++) {
           let option = document.createElement("option");
           let lotIDHTML = document.getElementById('lot-container-'+arrayOpts[i]);
           let lotNumber = lotIDHTML.querySelector(`[id*='Lot-']`).outerHTML;
