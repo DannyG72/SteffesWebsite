@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffesgroup Utilities
 // @namespace    https://github.com/DannyG72
-// @version      3.6
+// @version      3.7
 // @description  Adds a few quick-link buttons to the Steffes Group website for quick assistance and admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
@@ -342,8 +342,10 @@
 
       if (currentPageUrl.startsWith('https://steffesgroup.com/Admin/SearchBidder')) {
         bidderButton.addEventListener("click", function() {let bidderString = document.getElementById("bidderSearch").value;
-        bidderString = bidderString.replace(/ /g,'%20');
-        window.location.href = 'https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString;});
+                                                           bidderString = bidderString.replace(/ /g,'%20');
+                                                           window.location.href = 'https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString;
+                                                          }
+                                     );
 
         bidderSearch.addEventListener("keyup", function(event) { if (event.keyCode === 13) {
           event.preventDefault();
@@ -381,9 +383,13 @@
           openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);
           ;}});
 
-        bidderButton.addEventListener("click", function() {let bidderString = document.getElementById("bidderSearch").value;
-        bidderString = bidderString.replace(/ /g,'%20');
-        openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);});
+        bidderButton.addEventListener("click", function() {
+            fireFoxDownload()
+            //let bidderString = document.getElementById("bidderSearch").value;
+            //bidderString = bidderString.replace(/ /g,'%20');
+            //openInNewTab('https://steffesgroup.com/Admin/SearchBidders?SearchText='+bidderString);
+        }
+                                     );
       }
 
       //Creates a button to open the SteffesGroup admin portal.
@@ -528,6 +534,7 @@ function sleep(delay) {
     var start = new Date().getTime();
     while (new Date().getTime() < start + delay);
 }
+
 
 function filterAuctions(searchString) {
 
