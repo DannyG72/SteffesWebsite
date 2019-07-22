@@ -308,24 +308,6 @@
       rightSide.appendChild(auctionSearchArchivedGo)
      }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       //Creates a search bar for searching bidders.
       let bidderSearch = document.createElement("INPUT");
       bidderSearch.id="bidderSearch";
