@@ -15,7 +15,7 @@
     let style = document.createElement('style');
     style.type = 'text/css';
     style.innerHTML = '.custom-button-for-stuff{' +
-        'background: #CE0000;' +
+        'background: #da291c;' +
         'color: #fff;' +
         'border-radius: 10px;' +
         'border: none;' +
@@ -36,7 +36,7 @@
         'color: #000;' +
         '}' +
         '.countdownText{' +
-        'background: #CE0000;' +
+        'background: #da291c;' +
         'color: #fff;' +
         'border-radius: 10px;' +
         'border: none;' +
@@ -63,7 +63,7 @@
         'left: 50%;' +
         'transform: translate(-50%, 0);' +
         'z-index: 1032;' +
-        'background: #CE0000;' +
+        'background: #da291c;' +
         '}' +
         '.custom-left-side{' +
         'position: fixed;' +
@@ -176,9 +176,9 @@
     }; // Hides it
     $('img[src="https://cdn.steffesgroup.com/static-files/images/interior/Steffes-Auctioneers-logo.png"]').hide();
     let oldHeader = document.getElementById('header-content')
-    oldHeader.style.background = "#CE0000"
+    oldHeader.style.background = "#da291c"
     let oldHeaderBackground = document.getElementById('header-bg')
-    oldHeaderBackground.style.background = "#CE0000"
+    oldHeaderBackground.style.background = "#da291c"
 
     steffesLogo.onclick = function(event) {
         window.location.href = 'https://steffesgroup.com';
