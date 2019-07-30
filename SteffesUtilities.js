@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steffes Group Website Admin Utilities
 // @namespace    https://github.com/DannyG72
-// @version      3.8
+// @version      3.9
 // @description  Adds a few quick-link buttons to the Steffes Group website for quick assistance and admin purposes. Quickly Search Bidders, Launch the Auction Backend, and edit an auction's lots.
 // @author       Daniel Glynn
 // @match        https://steffesgroup.com/*
@@ -65,6 +65,19 @@
         'z-index: 1032;' +
         'background: #da291c;' +
         '}' +
+        '.custom-div-grandParent{' +
+        'display: inline-flex;' +
+        'align-items: center;' +
+        'justify-content: center;' +
+        'position: fixed;' +
+        'width: 100%;' +
+        'height: 60px;' +
+        'top: 0;' +
+        'left: 50%;' +
+        'transform: translate(-50%, 0);' +
+        'z-index: 1031;' +
+        'background: #da291c;' +
+        '}' +
         '.custom-left-side{' +
         'position: fixed;' +
         'width: 65%;' +
@@ -123,10 +136,14 @@
     let AuctionID = ((currentPageUrl.split("").reverse().join("").split("-"))[0]).split("").reverse().join("");
     let nextLotBidderButton = document.createElement("Button");
 
+    let grandParent = document.createElement('div');
+    grandParent.className = 'custom-div-grandParent';
+    document.body.appendChild(grandParent)
 
     let parent = document.createElement('div');
     parent.className = 'custom-div-parent';
-    document.body.appendChild(parent);
+    grandParent.appendChild(parent);
+
 
     let leftSide = document.createElement('div');
     leftSide.className = 'custom-left-side';
