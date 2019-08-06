@@ -422,7 +422,8 @@
             backendButton.id = "backendButton";
             backendButton.className = 'custom-button-for-stuff custom-admin-button'
             backendButton.addEventListener("click", function() {
-                openInNewTab('https://steffesgroup.com/Admin/AuctionDetails?auctionId=' + AuctionID);
+                //openInNewTab('https://steffesgroup.com/Admin/AuctionDetails?auctionId=' + AuctionID);
+                window.location.href = 'https://steffesgroup.com/Admin/AuctionDetails?auctionId=' + AuctionID
             });
 
             let html = content.innerHTML;
