@@ -257,11 +257,9 @@
             auctionSearchCurrentGo.addEventListener("click", function() {
                 let auctionString = document.getElementById("auctionSearch").value;
                 auctionString = auctionString.replace(/ /g, '%20');
-                console.log(currentPageUrl)
                 if (((currentPageUrl.includes('?Filter=')) && ((currentPageUrl.endsWith('?Filter=')) == false)) || (((currentPageUrl.includes('ArchivedAuctions')) == false) && ((currentPageUrl.endsWith('Filter=')) == false) && (((currentPageUrl.endsWith('Auctions')) == false)))) {
                     // auctionSearchString = currentPageUrl.split('?Filter=')[1]
                     // auctionSearchString = auctionSearchString.replace('%20',' ')
-                    console.log('stahp')
                     window.location.href = 'https://steffesgroup.com/Auction/AllAuctions?Filter=' + auctionString;
                 } else {
                     if ((auctionString.length > 0) && (currentPageUrl.endsWith('Auctions'))) {
@@ -282,11 +280,9 @@
                     event.preventDefault();
                     let auctionString = document.getElementById("auctionSearch").value;
                     auctionString = auctionString.replace(/ /g, '%20');
-                    console.log(currentPageUrl)
                     if (((currentPageUrl.includes('?Filter=')) && ((currentPageUrl.endsWith('?Filter=')) == false)) || (((currentPageUrl.includes('ArchivedAuctions')) == false) && ((currentPageUrl.endsWith('Filter=')) == false) && (((currentPageUrl.endsWith('Auctions')) == false)))) {
                         // auctionSearchString = currentPageUrl.split('?Filter=')[1]
                         // auctionSearchString = auctionSearchString.replace('%20',' ')
-                        console.log('stahp')
                         window.location.href = 'https://steffesgroup.com/Auction/AllAuctions?Filter=' + auctionString;
                     } else {
                         if ((auctionString.length > 0) && (currentPageUrl.endsWith('Auctions'))) {
@@ -369,7 +365,6 @@
                 bidderSearch.defaultValue = oldSearch
             } catch (err) {}
             nextLotBidderButton.style.width = '140px'
-            console.log(1)
             nextLotBidderButton.addEventListener("click", function() {
                 let bidderString = document.getElementById("bidderSearch").value;
                 bidderString = bidderString.replace(/ /g, '%20');
@@ -472,7 +467,6 @@
             lotBackendGo.className = 'custom-button-for-stuff'
             lotBackendGo.addEventListener("click", function() {
                 let selected = selectList.selectedOptions[0].value;
-                console.log(selected)
                 if (selected == 'View All') {
                     if (currentPageUrl.includes('&')) {
                         let lotViewAllUrl = currentPageUrl.split('&')
@@ -538,6 +532,8 @@
             $(".advancedSearchBtn").hide();
         }
     }
+
+
 })();
 
 //Opens a url in a new tab
