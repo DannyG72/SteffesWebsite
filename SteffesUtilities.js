@@ -15,117 +15,143 @@
     let style = document.createElement('style');
     style.type = 'text/css';
     style.innerHTML = '.custom-button-for-stuff{' +
-        'background: #da291c;' +
-        'color: #fff;' +
-        'border-radius: 10px;' +
-        'border: none;' +
-        'box-shadow: none;' +
-        'cursor: pointer;' +
-        'padding-left: 5px;' +
-        'margin-right: 5px;' +
-        'padding-right: 5px;' +
-        'height: 30px;' +
-        'font-size: 18px;' +
-        'z-index: 1034;' +
-        'outline: none;' +
-        'display: inline-block;' +
-        'min-width: 40px;' +
-        '}' +
-        '.custom-button-for-stuff:hover{' +
-        'background: #fff;' +
-        'color: #000;' +
-        '}' +
-        '.countdownText{' +
-        'background: #da291c;' +
-        'color: #fff;' +
-        'border-radius: 10px;' +
-        'border: none;' +
-        'box-shadow: none;' +
-        'cursor: pointer;' +
-        'padding-left: 5px;' +
-        'margin-right: 5px;' +
-        'padding-right: 5px;' +
-        'height: 30px;' +
-        'font-size: 18px;' +
-        'z-index: 1034;' +
-        'outline: none;' +
-        'display: inline-block;' +
-        'min-width: 40px;' +
-        '}' +
-        '.custom-div-parent{' +
-        'display: inline-flex;' +
-        'align-items: center;' +
-        'justify-content: center;' +
-        'position: fixed;' +
-        'width: 955px;' +
-        'height: 60px;' +
-        'top: 0;' +
-        'left: 50%;' +
-        'transform: translate(-50%, 0);' +
-        'z-index: 1032;' +
-        'background: #da291c;' +
-        '}' +
-        '.custom-div-grandParent{' +
-        'display: inline-flex;' +
-        'align-items: center;' +
-        'justify-content: center;' +
-        'position: fixed;' +
-        'width: 100%;' +
-        'height: 60px;' +
-        'top: 0;' +
-        'left: 50%;' +
-        'transform: translate(-50%, 0);' +
-        'z-index: 1031;' +
-        'background: #da291c;' +
-        '}' +
-        '.custom-left-side{' +
-        'position: fixed;' +
-        'width: 65%;' +
-        'height: 100%;' +
-        'display: flex;' +
-        'transform: translate(-28%, 0);' +
-        'z-index: 1033;' +
-        'align-items: center;' +
-        'justify-content: flex-start;' +
-        '}' +
-        '.custom-right-side{' +
-        'position: fixed;' +
-        'width: 45%;' +
-        'height: 100%;' +
-        'transform: translate(67%, 0);' +
-        'display: flex;' +
-        'z-index: 1033;' +
-        'align-items: center;' +
-        'justify-content: flex-end;' +
-        '}' +
-        '.custom-admin-button{' +
-        'justify-self: center;' +
-        'min-width: 113px; !important' +
-        'z-index: 1034;' +
-        'padding-left: 10px;' +
-        'display: inline-block;' +
-        '}' +
-        '.custom-search-input{' +
-        'height: 30px;' +
-        'width: 170px;' +
-        'z-index: 1034;' +
-        'border-radius: 10px;' +
-        'outline: none;' +
-        'border: none;' +
-        'box-shadow: none;' +
-        'padding-left: 10px;' +
-        'margin-right: 5px;' +
-        'font-size: 18px;' +
-        '}' +
-        '.custom-select-input{' +
-        'width: 100px;' +
-        'height: 30px;' +
-        'font-size: 18px;' +
-        'outline: none;' +
-        'z-index: 1034;' +
-        'margin-right: 5px;' +
-        'border-radius: 10px;' +
-        '}'
+    'background: #da291c;' +
+    'color: #fff;' +
+    'border-radius: 10px;' +
+    'border: none;' +
+    'box-shadow: none;' +
+    'cursor: pointer;' +
+    'padding-left: 5px;' +
+    'margin-right: 5px;' +
+    'padding-right: 5px;' +
+    'height: 30px;' +
+    'font-size: 18px;' +
+    'z-index: 1034;' +
+    'outline: none;' +
+    'display: inline-block;' +
+    'min-width: 40px;' +
+    '}' +
+    '.custom-button-for-stuff:hover{' +
+    'background: #fff;' +
+    'color: #000;' +
+    '}' +
+    '.auctionDropDown{' +
+    'position: relative;' +
+    'display: inline-block;' +
+    '}' +
+    '.dropdown-content{' +
+    'display: none;' +
+    'position: absolute;' +
+    'background-color: #f6f6f6;' +
+    'min-width: 210px;' +
+    'overflow: auto;' +
+    'border: 1px solid #ddd;' +
+    '}' +
+    '.filtered-auction{' +
+    'border-top: 8px solid #cccccc !important;' +
+    'border-bottom: 8px solid #cccccc !important;' +
+    'border-left: 1px solid #cccccc !important;' +
+    'border-right: 1px solid #cccccc !important;' +
+    'padding: 10px 15px 0px;' +
+    'position: relative;' +
+    'top: -29px;' +
+    '}' +
+    '.filtered-auction .heading{' +
+    'color: #cc0000;' +
+    'font-size: 18px;' +
+    'font-weight: bold;' +
+    '}' +
+    '.countdownText{' +
+    'background: #da291c;' +
+    'color: #fff;' +
+    'border-radius: 10px;' +
+    'border: none;' +
+    'box-shadow: none;' +
+    'cursor: pointer;' +
+    'padding-left: 5px;' +
+    'margin-right: 5px;' +
+    'padding-right: 5px;' +
+    'height: 30px;' +
+    'font-size: 18px;' +
+    'z-index: 1034;' +
+    'outline: none;' +
+    'display: inline-block;' +
+    'min-width: 40px;' +
+    '}' +
+    '.custom-div-parent{' +
+    'display: inline-flex;' +
+    'align-items: center;' +
+    'justify-content: center;' +
+    'position: fixed;' +
+    'width: 955px;' +
+    'height: 60px;' +
+    'top: 0;' +
+    'left: 50%;' +
+    'transform: translate(-50%, 0);' +
+    'z-index: 1032;' +
+    'background: #da291c;' +
+    '}' +
+    '.custom-div-grandParent{' +
+    'display: inline-flex;' +
+    'align-items: center;' +
+    'justify-content: center;' +
+    'position: fixed;' +
+    'width: 100%;' +
+    'height: 60px;' +
+    'top: 0;' +
+    'left: 50%;' +
+    'transform: translate(-50%, 0);' +
+    'z-index: 1031;' +
+    'background: #da291c;' +
+    '}' +
+    '.custom-left-side{' +
+    'position: fixed;' +
+    'width: 65%;' +
+    'height: 100%;' +
+    'display: flex;' +
+    'transform: translate(-28%, 0);' +
+    'z-index: 1033;' +
+    'align-items: center;' +
+    'justify-content: flex-start;' +
+    '}' +
+    '.custom-right-side{' +
+    'position: fixed;' +
+    'width: 45%;' +
+    'height: 100%;' +
+    'transform: translate(67%, 0);' +
+    'display: flex;' +
+    'z-index: 1033;' +
+    'align-items: center;' +
+    'justify-content: flex-end;' +
+    '}' +
+    '.custom-admin-button{' +
+    'justify-self: center;' +
+    'min-width: 113px; !important' +
+    'z-index: 1034;' +
+    'padding-left: 10px;' +
+    'display: inline-block;' +
+    '}' +
+    '.custom-search-input{' +
+    'height: 30px;' +
+    'width: 170px;' +
+    'z-index: 1034;' +
+    'border-radius: 10px;' +
+    'outline: none;' +
+    'border: none;' +
+    'box-shadow: none;' +
+    'padding-left: 10px;' +
+    'margin-right: 5px;' +
+    'font-size: 18px;' +
+    '}' +
+    '.custom-select-input{' +
+    'width: 100px;' +
+    'height: 30px;' +
+    'font-size: 18px;' +
+    'outline: none;' +
+    'z-index: 1034;' +
+    'margin-right: 5px;' +
+    'border-radius: 10px;' +
+    '}'
 
     document.getElementsByTagName('head')[0].appendChild(style);
 
@@ -228,6 +254,10 @@
             let auctionSearch = document.createElement("INPUT");
 
             auctionSearch.id = "auctionSearch";
+
+            auctionSearch.onclick = function(event) {
+                console.log('yeet');
+            };
             auctionSearch.className = 'custom-search-input';
 
             if (currentPageUrl.includes('?Filter=')) {
@@ -570,6 +600,7 @@ function filterAuctions(searchString) {
         let auction = auctions[i]
         let parentDIV = auction.parentElement.parentElement.parentElement.parentElement.parentElement
         parentDIV.setAttribute("id", "auction--" + i.toString() + '--');
+        parentDIV.setAttribute('class','filtered-auction')
         let auctionHTML = auction.outerHTML.toLowerCase()
         let searchText = searchString.toLowerCase()
         if (auctionHTML.includes(searchText)) {} else {
